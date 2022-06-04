@@ -45,7 +45,7 @@ export class SJSDiscord {
   public init(opts: SJSDiscordInitOpts) {
     return combineLatest([
       defer(() => this.client.login(opts.token)),
-      this.sources.twitch.init().pipe(
+      this.sources.twitch.init(opts.sources.twitch).pipe(
         tap(() => {
           this.sources.twitch.subscribeToStreamChanges(this.client);
         }),

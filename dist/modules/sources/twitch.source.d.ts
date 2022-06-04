@@ -13,7 +13,7 @@ export declare class TwitchSource {
     private readonly configService;
     streamChanges: Subject<TwitchSourceStreamChanges>;
     constructor(opts: TwitchSourceOpts, sslCert: EventSubListenerCertificateConfig, configService: SJSConfiguration);
-    init(): import("rxjs").Observable<import("@twurple/eventsub").EventSubSubscription<unknown>[]>;
+    init(opts: TwitchSourceOpts): import("rxjs").Observable<import("@twurple/eventsub").EventSubSubscription<unknown>[]>;
     addStreamers(guildId: string, displayNames: string[]): import("rxjs").Observable<StreamerInfo[]>;
     removeStreamers(guildId: string, displayNames: string[]): import("rxjs").Observable<void[]>;
     subscribeToStreamChanges(client: Client): import("rxjs").Subscription;

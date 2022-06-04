@@ -4,6 +4,7 @@ export interface TwitchSourceOpts {
     clientSecret: string;
     hostName: string;
     expressMiddleware?: boolean;
+    port?: number;
 }
 export interface TwitchSourceStreamChanges {
     guildId: string;

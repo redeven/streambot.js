@@ -39,8 +39,8 @@ class TwitchSource {
             strictHostCheck: true,
         });
     }
-    init() {
-        return (0, rxjs_1.iif)(() => this.isExpressMiddleware, (0, rxjs_1.defer)(() => this.eventSubMiddleware.markAsReady()), (0, rxjs_1.defer)(() => this.eventSubListener.listen())).pipe((0, rxjs_1.tap)(() => {
+    init(opts) {
+        return (0, rxjs_1.iif)(() => this.isExpressMiddleware, (0, rxjs_1.defer)(() => this.eventSubMiddleware.markAsReady()), (0, rxjs_1.defer)(() => this.eventSubListener.listen(opts.port || 443))).pipe((0, rxjs_1.tap)(() => {
             console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Listening`);
         }), (0, rxjs_1.switchMap)(() => {
             return (0, rxjs_1.combineLatest)(Object.values(this.configuration.guilds).map((guild) => (0, rxjs_1.combineLatest)(Object.values(guild.sources.twitch).map((streamer) => this.setStreamerSubscription(guild.guildId, streamer.userId))).pipe((0, rxjs_1.tap)((streamers) => {
@@ -136,21 +136,16 @@ class TwitchSource {
             .subscribe();
     }
     setStreamerSubscription(guildId, userId) {
-        return (0, rxjs_1.iif)(() => this.isExpressMiddleware, (0, rxjs_1.defer)(() => this.eventSubMiddleware.subscribeToStreamOnlineEvents(userId, (stream) => {
+        const streamChanges = this.streamChanges;
+        const onStreamEvent = (stream) => {
             if (stream)
-                this.streamChanges.next({ guildId, userId, stream });
-        })).pipe((0, rxjs_1.tap)((subscription) => {
+                streamChanges.next({ guildId, userId, stream });
+        };
+        return (0, rxjs_1.iif)(() => this.isExpressMiddleware, (0, rxjs_1.defer)(() => this.eventSubMiddleware.subscribeToStreamOnlineEvents(userId, onStreamEvent)), (0, rxjs_1.defer)(() => this.eventSubListener.subscribeToStreamOnlineEvents(userId, onStreamEvent))).pipe((0, rxjs_1.take)(1), (0, rxjs_1.tap)((subscription) => {
             if (!this.subscriptions[guildId])
                 this.subscriptions[guildId] = {};
             this.subscriptions[guildId][userId] = subscription;
-        })), (0, rxjs_1.defer)(() => this.eventSubListener.subscribeToStreamOnlineEvents(userId, (stream) => {
-            if (stream)
-                this.streamChanges.next({ guildId, userId, stream });
-        })).pipe((0, rxjs_1.tap)((subscription) => {
-            if (!this.subscriptions[guildId])
-                this.subscriptions[guildId] = {};
-            this.subscriptions[guildId][userId] = subscription;
-        })));
+        }));
     }
     removeStreamerSubscription(guildId, streamer) {
         const subscription = this.subscriptions[guildId][streamer.userId];

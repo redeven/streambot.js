@@ -37,7 +37,7 @@ class SJSDiscord {
     init(opts) {
         return (0, rxjs_1.combineLatest)([
             (0, rxjs_1.defer)(() => this.client.login(opts.token)),
-            this.sources.twitch.init().pipe((0, rxjs_1.tap)(() => {
+            this.sources.twitch.init(opts.sources.twitch).pipe((0, rxjs_1.tap)(() => {
                 this.sources.twitch.subscribeToStreamChanges(this.client);
             })),
             this.sources.trovo.init().pipe((0, rxjs_1.tap)(() => {

@@ -1,6 +1,12 @@
 import { ApiClient } from '@twurple/api';
 import { ClientCredentialsAuthProvider } from '@twurple/auth';
-import { DirectConnectionAdapter, EventSubListener, EventSubListenerCertificateConfig, EventSubMiddleware } from '@twurple/eventsub';
+import {
+  DirectConnectionAdapter,
+  EventSubListener,
+  EventSubListenerCertificateConfig,
+  EventSubMiddleware,
+  EventSubStreamOnlineEvent,
+} from '@twurple/eventsub';
 import { Client, MessageEditOptions, MessageOptions, TextChannel } from 'discord.js';
 import moment from 'moment';
 import { catchError, combineLatest, defer, EMPTY, iif, map, of, Subject, switchMap, take, tap } from 'rxjs';
@@ -52,11 +58,11 @@ export class TwitchSource {
     });
   }
 
-  public init() {
+  public init(opts: TwitchSourceOpts) {
     return iif(
       () => this.isExpressMiddleware,
       defer(() => this.eventSubMiddleware.markAsReady()),
-      defer(() => this.eventSubListener.listen()),
+      defer(() => this.eventSubListener.listen(opts.port || 443)),
     ).pipe(
       tap(() => {
         console.log(`[${getNow()}] [streambot.js] {Twitch} Listening`);
@@ -179,28 +185,20 @@ export class TwitchSource {
   }
 
   public setStreamerSubscription(guildId: string, userId: string) {
+    const streamChanges = this.streamChanges;
+    const onStreamEvent = (stream: EventSubStreamOnlineEvent) => {
+      if (stream) streamChanges.next({ guildId, userId, stream });
+    };
     return iif(
       () => this.isExpressMiddleware,
-      defer(() =>
-        this.eventSubMiddleware.subscribeToStreamOnlineEvents(userId, (stream) => {
-          if (stream) this.streamChanges.next({ guildId, userId, stream });
-        }),
-      ).pipe(
-        tap((subscription) => {
-          if (!this.subscriptions[guildId]) this.subscriptions[guildId] = {};
-          this.subscriptions[guildId][userId] = subscription;
-        }),
-      ),
-      defer(() =>
-        this.eventSubListener.subscribeToStreamOnlineEvents(userId, (stream) => {
-          if (stream) this.streamChanges.next({ guildId, userId, stream });
-        }),
-      ).pipe(
-        tap((subscription) => {
-          if (!this.subscriptions[guildId]) this.subscriptions[guildId] = {};
-          this.subscriptions[guildId][userId] = subscription;
-        }),
-      ),
+      defer(() => this.eventSubMiddleware.subscribeToStreamOnlineEvents(userId, onStreamEvent)),
+      defer(() => this.eventSubListener.subscribeToStreamOnlineEvents(userId, onStreamEvent)),
+    ).pipe(
+      take(1),
+      tap((subscription) => {
+        if (!this.subscriptions[guildId]) this.subscriptions[guildId] = {};
+        this.subscriptions[guildId][userId] = subscription;
+      }),
     );
   }
 

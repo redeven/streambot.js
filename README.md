@@ -1,6 +1,6 @@
 # streambot.js
 
-[![GitHub license](https://img.shields.io/github/license/redeven/streambot.js)](https://github.com/redeven/streambot.js/blob/main/LICENSE)
+[![GitHub](https://img.shields.io/github/license/redeven/streambot.js?style=for-the-badge)](https://github.com/redeven/streambot.js/blob/master/LICENSE)
 
 Library that exports a ready-to-use Discord bot that relays online stream status messages for your streamers of choice from supported platforms.
 

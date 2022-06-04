@@ -41,12 +41,14 @@ export class TwitchSource {
         minLevel: LogLevel.CRITICAL,
         emoji: false,
       },
+      strictHostCheck: true,
     });
     this.eventSubMiddleware = new EventSubMiddleware({
       apiClient: this.apiClient,
       hostName,
       pathPrefix: '/twitch',
       secret: clientSecret,
+      strictHostCheck: true,
     });
   }
 

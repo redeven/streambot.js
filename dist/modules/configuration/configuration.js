@@ -11,6 +11,7 @@ class SJSConfiguration {
     setConfiguration(configuration) {
         (0, lodash_1.defaultsDeep)(configuration, SJSConfiguration.defaults);
         this._configuration = configuration;
+        this.saveChanges();
     }
     getConfiguration() {
         return this._configuration;

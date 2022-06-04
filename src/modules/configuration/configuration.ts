@@ -13,6 +13,7 @@ export class SJSConfiguration {
   public setConfiguration(configuration: IConfiguration) {
     defaultsDeep(configuration, SJSConfiguration.defaults);
     this._configuration = configuration;
+    this.saveChanges();
   }
 
   public getConfiguration(): IConfiguration {

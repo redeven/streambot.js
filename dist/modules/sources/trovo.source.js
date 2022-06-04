@@ -17,13 +17,21 @@ class TrovoSource {
     }
     init() {
         return (0, rxjs_1.of)(null).pipe((0, rxjs_1.tap)(() => {
-            Object.values(this.configuration.guilds).forEach((guild) => {
-                const STREAMERS = Object.values(guild.sources.trovo);
-                STREAMERS.forEach((streamer) => {
-                    this.setStreamerSubscription(guild.guildId, streamer.userId);
+            const GUILDS = Object.values(this.configuration.guilds);
+            const HAS_GUILDS = GUILDS.length > 0;
+            const HAS_STREAMERS = GUILDS.some((guild) => Object.values(guild.sources.trovo).length > 0);
+            if (HAS_GUILDS && HAS_STREAMERS) {
+                Object.values(this.configuration.guilds).forEach((guild) => {
+                    const STREAMERS = Object.values(guild.sources.trovo);
+                    STREAMERS.forEach((streamer) => {
+                        this.setStreamerSubscription(guild.guildId, streamer.userId);
+                    });
+                    console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Trovo} Subscribed to ${STREAMERS.length} channels on server ${guild.guildName}`);
                 });
-                console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Trovo} Subscribed to ${STREAMERS.length} channels on server ${guild.guildName}`);
-            });
+            }
+            else {
+                console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Trovo} No channels to subscribe`);
+            }
         }));
     }
     addStreamers(guildId, displayNames) {

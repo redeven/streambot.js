@@ -68,13 +68,26 @@ export class TwitchSource {
         console.log(`[${getNow()}] [streambot.js] {Twitch} Listening`);
       }),
       switchMap(() => {
-        return combineLatest(
-          Object.values(this.configuration.guilds).map((guild) =>
-            combineLatest(Object.values(guild.sources.twitch).map((streamer) => this.setStreamerSubscription(guild.guildId, streamer.userId))).pipe(
-              tap((streamers) => {
-                console.log(`[${getNow()}] [streambot.js] {Twitch} Subscribed to ${streamers.length} channels on server ${guild.guildName}`);
-              }),
+        return iif(
+          () => {
+            const GUILDS = Object.values(this.configuration.guilds);
+            const HAS_GUILDS = GUILDS.length > 0;
+            const HAS_STREAMERS = GUILDS.some((guild) => Object.values(guild.sources.twitch).length > 0);
+            return HAS_GUILDS && HAS_STREAMERS;
+          },
+          combineLatest(
+            Object.values(this.configuration.guilds).map((guild) =>
+              combineLatest(Object.values(guild.sources.twitch).map((streamer) => this.setStreamerSubscription(guild.guildId, streamer.userId))).pipe(
+                tap((streamers) => {
+                  console.log(`[${getNow()}] [streambot.js] {Twitch} Subscribed to ${streamers.length} channels on server ${guild.guildName}`);
+                }),
+              ),
             ),
+          ),
+          of(null).pipe(
+            tap(() => {
+              console.log(`[${getNow()}] [streambot.js] {Twitch} No channels to subscribe`);
+            }),
           ),
         );
       }),

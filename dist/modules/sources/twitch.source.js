@@ -43,9 +43,16 @@ class TwitchSource {
         return (0, rxjs_1.iif)(() => this.isExpressMiddleware, (0, rxjs_1.defer)(() => this.eventSubMiddleware.markAsReady()), (0, rxjs_1.defer)(() => this.eventSubListener.listen(opts.port || 443))).pipe((0, rxjs_1.tap)(() => {
             console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Listening`);
         }), (0, rxjs_1.switchMap)(() => {
-            return (0, rxjs_1.combineLatest)(Object.values(this.configuration.guilds).map((guild) => (0, rxjs_1.combineLatest)(Object.values(guild.sources.twitch).map((streamer) => this.setStreamerSubscription(guild.guildId, streamer.userId))).pipe((0, rxjs_1.tap)((streamers) => {
+            return (0, rxjs_1.iif)(() => {
+                const GUILDS = Object.values(this.configuration.guilds);
+                const HAS_GUILDS = GUILDS.length > 0;
+                const HAS_STREAMERS = GUILDS.some((guild) => Object.values(guild.sources.twitch).length > 0);
+                return HAS_GUILDS && HAS_STREAMERS;
+            }, (0, rxjs_1.combineLatest)(Object.values(this.configuration.guilds).map((guild) => (0, rxjs_1.combineLatest)(Object.values(guild.sources.twitch).map((streamer) => this.setStreamerSubscription(guild.guildId, streamer.userId))).pipe((0, rxjs_1.tap)((streamers) => {
                 console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Subscribed to ${streamers.length} channels on server ${guild.guildName}`);
-            }))));
+            })))), (0, rxjs_1.of)(null).pipe((0, rxjs_1.tap)(() => {
+                console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} No channels to subscribe`);
+            })));
         }), (0, rxjs_1.switchMap)(() => this.reauthorizeInvalidSubscriptions()));
     }
     addStreamers(guildId, displayNames) {

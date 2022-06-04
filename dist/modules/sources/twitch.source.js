@@ -29,12 +29,14 @@ class TwitchSource {
                 minLevel: twitch_source_model_1.LogLevel.CRITICAL,
                 emoji: false,
             },
+            strictHostCheck: true,
         });
         this.eventSubMiddleware = new eventsub_1.EventSubMiddleware({
             apiClient: this.apiClient,
             hostName,
             pathPrefix: '/twitch',
             secret: clientSecret,
+            strictHostCheck: true,
         });
     }
     init() {

@@ -8,8 +8,8 @@ export declare class SJSDiscord {
     private rest;
     private commands;
     private sources;
-    constructor(opts: SJSDiscordInitOpts, configService: SJSConfiguration);
-    init(opts: SJSDiscordInitOpts, sslCert: EventSubListenerCertificateConfig, configService: SJSConfiguration): Observable<any[]>;
+    constructor(opts: SJSDiscordInitOpts, configService: SJSConfiguration, sslCert: EventSubListenerCertificateConfig);
+    init(opts: SJSDiscordInitOpts): Observable<any[]>;
     private setBotCommands;
     private registerBotCommands;
     private removeDeprecatedCommands;

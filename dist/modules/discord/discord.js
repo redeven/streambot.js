@@ -11,7 +11,7 @@ const commands_1 = require("./commands");
 const twitch_source_1 = require("../sources/twitch.source");
 const trovo_source_1 = require("../sources/trovo.source");
 class SJSDiscord {
-    constructor(opts, configService) {
+    constructor(opts, configService, sslCert) {
         this.commands = new discord_js_1.Collection();
         this.sources = {};
         this.configService = configService;
@@ -29,18 +29,20 @@ class SJSDiscord {
         this.client.on('guildDelete', this.onGuildDelete.bind(this));
         this.client.on('guildDelete', this.onGuildDelete.bind(this));
         this.client.on('interactionCreate', this.onInteractionCreate.bind(this));
+        if (opts.sources.twitch)
+            this.sources.twitch = new twitch_source_1.TwitchSource(opts.sources.twitch, sslCert, configService);
+        if (opts.sources.trovo)
+            this.sources.trovo = new trovo_source_1.TrovoSource(opts.sources.trovo, configService);
         this.setBotCommands();
     }
-    init(opts, sslCert, configService) {
+    init(opts) {
         const INIT_CHAIN = [(0, rxjs_1.defer)(() => this.client.login(opts.token))];
-        if (opts.sources.twitch) {
-            const SOURCE = new twitch_source_1.TwitchSource(opts.sources.twitch, sslCert, configService);
-            this.sources.twitch = SOURCE;
+        if (opts.sources.twitch && this.sources.twitch) {
+            const SOURCE = this.sources.twitch;
             INIT_CHAIN.push(SOURCE.init(opts.sources.twitch).pipe((0, rxjs_1.tap)(() => SOURCE.subscribeToStreamChanges(this.client))));
         }
-        if (opts.sources.trovo) {
-            const SOURCE = new trovo_source_1.TrovoSource(opts.sources.trovo, configService);
-            this.sources.trovo = SOURCE;
+        if (opts.sources.trovo && this.sources.trovo) {
+            const SOURCE = this.sources.trovo;
             INIT_CHAIN.push(SOURCE.init().pipe((0, rxjs_1.tap)(() => SOURCE.subscribeToStreamChanges(this.client))));
         }
         return (0, rxjs_1.combineLatest)(INIT_CHAIN);

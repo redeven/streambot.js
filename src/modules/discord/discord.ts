@@ -19,7 +19,7 @@ export class SJSDiscord {
   private commands: Collection<string, Command> = new Collection();
   private sources: IDiscordSources = {};
 
-  constructor(opts: SJSDiscordInitOpts, configService: SJSConfiguration) {
+  constructor(opts: SJSDiscordInitOpts, configService: SJSConfiguration, sslCert: EventSubListenerCertificateConfig) {
     this.configService = configService;
     this.rest = new REST({ version: '9' }).setToken(opts.token);
     this.client = new Client({
@@ -35,19 +35,19 @@ export class SJSDiscord {
     this.client.on('guildDelete', this.onGuildDelete.bind(this));
     this.client.on('guildDelete', this.onGuildDelete.bind(this));
     this.client.on('interactionCreate', this.onInteractionCreate.bind(this));
+    if (opts.sources.twitch) this.sources.twitch = new TwitchSource(opts.sources.twitch, sslCert, configService);
+    if (opts.sources.trovo) this.sources.trovo = new TrovoSource(opts.sources.trovo, configService);
     this.setBotCommands();
   }
 
-  public init(opts: SJSDiscordInitOpts, sslCert: EventSubListenerCertificateConfig, configService: SJSConfiguration) {
+  public init(opts: SJSDiscordInitOpts) {
     const INIT_CHAIN: Observable<any>[] = [defer(() => this.client.login(opts.token))];
-    if (opts.sources.twitch) {
-      const SOURCE = new TwitchSource(opts.sources.twitch, sslCert, configService);
-      this.sources.twitch = SOURCE;
+    if (opts.sources.twitch && this.sources.twitch) {
+      const SOURCE = this.sources.twitch;
       INIT_CHAIN.push(SOURCE.init(opts.sources.twitch).pipe(tap(() => SOURCE.subscribeToStreamChanges(this.client))));
     }
-    if (opts.sources.trovo) {
-      const SOURCE = new TrovoSource(opts.sources.trovo, configService);
-      this.sources.trovo = SOURCE;
+    if (opts.sources.trovo && this.sources.trovo) {
+      const SOURCE = this.sources.trovo;
       INIT_CHAIN.push(SOURCE.init().pipe(tap(() => SOURCE.subscribeToStreamChanges(this.client))));
     }
     return combineLatest(INIT_CHAIN);

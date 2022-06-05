@@ -11,11 +11,11 @@ export class StreambotJs {
   constructor(opts: StreambotJsInitOpts, sslCert: StreambotJsSslCert) {
     this.configService = new SJSConfiguration();
     this.sslCert = sslCert;
-    this.discord = new SJSDiscord(opts.discordOpts, this.configService);
+    this.discord = new SJSDiscord(opts.discordOpts, this.configService, this.sslCert);
   }
 
   public init(opts: StreambotJsInitOpts) {
-    return this.discord.init(opts.discordOpts, this.sslCert, this.configService);
+    return this.discord.init(opts.discordOpts);
   }
 
   public setConfiguration(configuration: IConfiguration) {

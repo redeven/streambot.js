@@ -7,10 +7,10 @@ class StreambotJs {
     constructor(opts, sslCert) {
         this.configService = new configuration_1.SJSConfiguration();
         this.sslCert = sslCert;
-        this.discord = new discord_1.SJSDiscord(opts.discordOpts, this.configService);
+        this.discord = new discord_1.SJSDiscord(opts.discordOpts, this.configService, this.sslCert);
     }
     init(opts) {
-        return this.discord.init(opts.discordOpts, this.sslCert, this.configService);
+        return this.discord.init(opts.discordOpts);
     }
     setConfiguration(configuration) {
         this.configService.setConfiguration(configuration);

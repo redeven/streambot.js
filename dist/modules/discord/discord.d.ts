@@ -8,8 +8,8 @@ export declare class SJSDiscord {
     private rest;
     private commands;
     private sources;
-    constructor(opts: SJSDiscordInitOpts, sslCert: EventSubListenerCertificateConfig, configService: SJSConfiguration);
-    init(opts: SJSDiscordInitOpts): Observable<[string, import("@twurple/eventsub/lib").EventSubSubscription<unknown>[], null]>;
+    constructor(opts: SJSDiscordInitOpts, configService: SJSConfiguration);
+    init(opts: SJSDiscordInitOpts, sslCert: EventSubListenerCertificateConfig, configService: SJSConfiguration): Observable<any[]>;
     private setBotCommands;
     private registerBotCommands;
     private removeDeprecatedCommands;
@@ -19,5 +19,5 @@ export declare class SJSDiscord {
     private onInteractionCreate;
     private getGuildDefaults;
     private get configuration();
-    get expressMiddleware(): import("@twurple/eventsub/lib").EventSubMiddleware;
+    get expressMiddleware(): import("@twurple/eventsub/lib").EventSubMiddleware | undefined;
 }

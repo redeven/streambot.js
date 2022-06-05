@@ -6,10 +6,11 @@ const discord_1 = require("./discord/discord");
 class StreambotJs {
     constructor(opts, sslCert) {
         this.configService = new configuration_1.SJSConfiguration();
-        this.discord = new discord_1.SJSDiscord(opts.discordOpts, sslCert, this.configService);
+        this.sslCert = sslCert;
+        this.discord = new discord_1.SJSDiscord(opts.discordOpts, this.configService);
     }
     init(opts) {
-        return this.discord.init(opts.discordOpts);
+        return this.discord.init(opts.discordOpts, this.sslCert, this.configService);
     }
     setConfiguration(configuration) {
         this.configService.setConfiguration(configuration);

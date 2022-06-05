@@ -6,14 +6,16 @@ import { SJSDiscord } from './discord/discord';
 export class StreambotJs {
   private readonly configService: SJSConfiguration;
   private readonly discord: SJSDiscord;
+  private readonly sslCert: StreambotJsSslCert;
 
   constructor(opts: StreambotJsInitOpts, sslCert: StreambotJsSslCert) {
     this.configService = new SJSConfiguration();
-    this.discord = new SJSDiscord(opts.discordOpts, sslCert, this.configService);
+    this.sslCert = sslCert;
+    this.discord = new SJSDiscord(opts.discordOpts, this.configService);
   }
 
   public init(opts: StreambotJsInitOpts) {
-    return this.discord.init(opts.discordOpts);
+    return this.discord.init(opts.discordOpts, this.sslCert, this.configService);
   }
 
   public setConfiguration(configuration: IConfiguration) {

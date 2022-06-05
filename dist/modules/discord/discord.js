@@ -11,8 +11,9 @@ const commands_1 = require("./commands");
 const twitch_source_1 = require("../sources/twitch.source");
 const trovo_source_1 = require("../sources/trovo.source");
 class SJSDiscord {
-    constructor(opts, sslCert, configService) {
+    constructor(opts, configService) {
         this.commands = new discord_js_1.Collection();
+        this.sources = {};
         this.configService = configService;
         this.rest = new rest_1.REST({ version: '9' }).setToken(opts.token);
         this.client = new discord_js_1.Client({
@@ -28,22 +29,21 @@ class SJSDiscord {
         this.client.on('guildDelete', this.onGuildDelete.bind(this));
         this.client.on('guildDelete', this.onGuildDelete.bind(this));
         this.client.on('interactionCreate', this.onInteractionCreate.bind(this));
-        this.sources = {
-            twitch: new twitch_source_1.TwitchSource(opts.sources.twitch, sslCert, configService),
-            trovo: new trovo_source_1.TrovoSource(opts.sources.trovo, configService),
-        };
         this.setBotCommands();
     }
-    init(opts) {
-        return (0, rxjs_1.combineLatest)([
-            (0, rxjs_1.defer)(() => this.client.login(opts.token)),
-            this.sources.twitch.init(opts.sources.twitch).pipe((0, rxjs_1.tap)(() => {
-                this.sources.twitch.subscribeToStreamChanges(this.client);
-            })),
-            this.sources.trovo.init().pipe((0, rxjs_1.tap)(() => {
-                this.sources.trovo.subscribeToStreamChanges(this.client);
-            })),
-        ]);
+    init(opts, sslCert, configService) {
+        const INIT_CHAIN = [(0, rxjs_1.defer)(() => this.client.login(opts.token))];
+        if (opts.sources.twitch) {
+            const SOURCE = new twitch_source_1.TwitchSource(opts.sources.twitch, sslCert, configService);
+            this.sources.twitch = SOURCE;
+            INIT_CHAIN.push(SOURCE.init(opts.sources.twitch).pipe((0, rxjs_1.tap)(() => SOURCE.subscribeToStreamChanges(this.client))));
+        }
+        if (opts.sources.trovo) {
+            const SOURCE = new trovo_source_1.TrovoSource(opts.sources.trovo, configService);
+            this.sources.trovo = SOURCE;
+            INIT_CHAIN.push(SOURCE.init().pipe((0, rxjs_1.tap)(() => SOURCE.subscribeToStreamChanges(this.client))));
+        }
+        return (0, rxjs_1.combineLatest)(INIT_CHAIN);
     }
     setBotCommands() {
         for (let factory of Object.values(commands_1.Commands)) {
@@ -137,7 +137,8 @@ class SJSDiscord {
         return this.configService.getConfiguration();
     }
     get expressMiddleware() {
-        return this.sources.twitch.expressMiddleware;
+        var _a;
+        return (_a = this.sources.twitch) === null || _a === void 0 ? void 0 : _a.expressMiddleware;
     }
 }
 exports.SJSDiscord = SJSDiscord;

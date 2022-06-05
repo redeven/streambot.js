@@ -8,15 +8,18 @@ export const VALIDATE_FACTORY: CommandFactory = (configService, sources) => {
     data: new SlashCommandBuilder().setName('validate').setDescription('Validate all Twitch subscriptions for SSL certification issues'),
     execute: (interaction: CommandInteraction) => {
       if (configService.getConfiguration().adminUsers.includes(interaction.member?.user.id || '')) {
-        defer(() => interaction.deferReply({ ephemeral: true }))
-          .pipe(
-            switchMap(() => {
-              return defer(() => interaction.editReply({ content: 'Subscription Status\n\n' + sources.twitch.getAllSubscriptionsStatus() }));
-            }),
-          )
-          .subscribe();
+        if (sources.twitch) {
+          const SOURCE = sources.twitch;
+          defer(() => interaction.deferReply({ ephemeral: true }))
+            .pipe(
+              switchMap(() => {
+                return defer(() => interaction.editReply({ content: 'Subscription Status\n\n' + SOURCE.getAllSubscriptionsStatus() }));
+              }),
+            )
+            .subscribe();
+        } else interaction.reply({ content: 'Twitch source disabled.', ephemeral: true });
       } else {
-        interaction.reply({ content: "Shut up nerd you're not the developer.", ephemeral: true });
+        interaction.reply({ content: `You don't have permissions to execute this command.`, ephemeral: true });
       }
     },
   };

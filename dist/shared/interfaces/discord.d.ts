@@ -7,13 +7,13 @@ import { TwitchSourceOpts } from './twitch.source.model';
 export interface SJSDiscordInitOpts {
     token: string;
     sources: {
-        twitch: TwitchSourceOpts;
-        trovo: TrovoSourceOpts;
+        twitch?: TwitchSourceOpts;
+        trovo?: TrovoSourceOpts;
     };
 }
 export interface IDiscordSources {
-    twitch: TwitchSource;
-    trovo: TrovoSource;
+    twitch?: TwitchSource;
+    trovo?: TrovoSource;
 }
 export interface Command {
     data: any;

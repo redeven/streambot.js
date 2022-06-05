@@ -17,9 +17,9 @@ export class SJSDiscord {
   private client: Client;
   private rest: REST;
   private commands: Collection<string, Command> = new Collection();
-  private sources: IDiscordSources;
+  private sources: IDiscordSources = {};
 
-  constructor(opts: SJSDiscordInitOpts, sslCert: EventSubListenerCertificateConfig, configService: SJSConfiguration) {
+  constructor(opts: SJSDiscordInitOpts, configService: SJSConfiguration) {
     this.configService = configService;
     this.rest = new REST({ version: '9' }).setToken(opts.token);
     this.client = new Client({
@@ -35,27 +35,22 @@ export class SJSDiscord {
     this.client.on('guildDelete', this.onGuildDelete.bind(this));
     this.client.on('guildDelete', this.onGuildDelete.bind(this));
     this.client.on('interactionCreate', this.onInteractionCreate.bind(this));
-    this.sources = {
-      twitch: new TwitchSource(opts.sources.twitch, sslCert, configService),
-      trovo: new TrovoSource(opts.sources.trovo, configService),
-    };
     this.setBotCommands();
   }
 
-  public init(opts: SJSDiscordInitOpts) {
-    return combineLatest([
-      defer(() => this.client.login(opts.token)),
-      this.sources.twitch.init(opts.sources.twitch).pipe(
-        tap(() => {
-          this.sources.twitch.subscribeToStreamChanges(this.client);
-        }),
-      ),
-      this.sources.trovo.init().pipe(
-        tap(() => {
-          this.sources.trovo.subscribeToStreamChanges(this.client);
-        }),
-      ),
-    ]);
+  public init(opts: SJSDiscordInitOpts, sslCert: EventSubListenerCertificateConfig, configService: SJSConfiguration) {
+    const INIT_CHAIN: Observable<any>[] = [defer(() => this.client.login(opts.token))];
+    if (opts.sources.twitch) {
+      const SOURCE = new TwitchSource(opts.sources.twitch, sslCert, configService);
+      this.sources.twitch = SOURCE;
+      INIT_CHAIN.push(SOURCE.init(opts.sources.twitch).pipe(tap(() => SOURCE.subscribeToStreamChanges(this.client))));
+    }
+    if (opts.sources.trovo) {
+      const SOURCE = new TrovoSource(opts.sources.trovo, configService);
+      this.sources.trovo = SOURCE;
+      INIT_CHAIN.push(SOURCE.init().pipe(tap(() => SOURCE.subscribeToStreamChanges(this.client))));
+    }
+    return combineLatest(INIT_CHAIN);
   }
 
   private setBotCommands(): void {
@@ -166,6 +161,6 @@ export class SJSDiscord {
   }
 
   public get expressMiddleware() {
-    return this.sources.twitch.expressMiddleware;
+    return this.sources.twitch?.expressMiddleware;
   }
 }

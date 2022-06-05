@@ -9,12 +9,17 @@ const REAUTHORIZE_FACTORY = (configService, sources) => {
         execute: (interaction) => {
             var _a;
             if (configService.getConfiguration().adminUsers.includes(((_a = interaction.member) === null || _a === void 0 ? void 0 : _a.user.id) || '')) {
-                (0, rxjs_1.defer)(() => interaction.deferReply({ ephemeral: true }))
-                    .pipe((0, rxjs_1.switchMap)(() => sources.twitch.reauthorizeInvalidSubscriptions()), (0, rxjs_1.switchMap)(() => (0, rxjs_1.defer)(() => interaction.editReply({ content: 'Finished refreshing all Twitch subscriptions' }))))
-                    .subscribe();
+                if (sources.twitch) {
+                    const SOURCE = sources.twitch;
+                    (0, rxjs_1.defer)(() => interaction.deferReply({ ephemeral: true }))
+                        .pipe((0, rxjs_1.switchMap)(() => SOURCE.reauthorizeInvalidSubscriptions()), (0, rxjs_1.switchMap)(() => (0, rxjs_1.defer)(() => interaction.editReply({ content: 'Finished refreshing all Twitch subscriptions' }))))
+                        .subscribe();
+                }
+                else
+                    interaction.reply({ content: 'Twitch source disabled.', ephemeral: true });
             }
             else {
-                interaction.reply({ content: "Shut up nerd you're not the developer.", ephemeral: true });
+                interaction.reply({ content: `You don't have permissions to execute this command.`, ephemeral: true });
             }
         },
     };

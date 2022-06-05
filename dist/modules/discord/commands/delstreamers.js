@@ -15,7 +15,7 @@ const DEL_STREAMERS_FACTORY = (configService, sources) => {
             .setName('source')
             .setDescription(`Source.`)
             .setRequired(true)
-            .addChoices(...sources_model_1.SOURCE_CHOICES.map((choice) => ({ value: choice, name: choice }))))
+            .addChoices(...sources_model_1.SOURCE_CHOICES.filter((source) => Object.keys(sources).includes(source)).map((choice) => ({ value: choice, name: choice }))))
             .addStringOption((option) => option.setName('channels').setDescription('List of channels to subscribe (space-separated)').setRequired(true)),
         execute: (interaction) => {
             var _a;
@@ -28,13 +28,23 @@ const DEL_STREAMERS_FACTORY = (configService, sources) => {
                     const CHANNELS = ((_a = _channels.value) === null || _a === void 0 ? void 0 : _a.toString().split(' ')) || [];
                     switch (_source.value) {
                         case 'twitch':
-                            (0, rxjs_1.defer)(() => interaction.deferReply({ ephemeral: true }))
-                                .pipe((0, operators_1.switchMap)(() => sources.twitch.removeStreamers(GUILD.id, CHANNELS)), (0, operators_1.switchMap)((streamers) => (0, rxjs_1.defer)(() => interaction.editReply({ content: `Removed ${streamers.length} Twitch channel${streamers.length === 1 ? '' : 's'}` }))))
-                                .subscribe();
+                            if (sources.twitch) {
+                                const SOURCE = sources.twitch;
+                                (0, rxjs_1.defer)(() => interaction.deferReply({ ephemeral: true }))
+                                    .pipe((0, operators_1.switchMap)(() => SOURCE.removeStreamers(GUILD.id, CHANNELS)), (0, operators_1.switchMap)((streamers) => (0, rxjs_1.defer)(() => interaction.editReply({ content: `Removed ${streamers.length} Twitch channel${streamers.length === 1 ? '' : 's'}` }))))
+                                    .subscribe();
+                            }
+                            else
+                                interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
                             break;
                         case 'trovo':
-                            const removedStreamers = sources.trovo.removeStreamers(GUILD.id, CHANNELS);
-                            interaction.reply({ content: `Removed ${removedStreamers} Trovo channel${removedStreamers === 1 ? '' : 's'}`, ephemeral: true });
+                            if (sources.trovo) {
+                                const SOURCE = sources.trovo;
+                                const removedStreamers = SOURCE.removeStreamers(GUILD.id, CHANNELS);
+                                interaction.reply({ content: `Removed ${removedStreamers} Trovo channel${removedStreamers === 1 ? '' : 's'}`, ephemeral: true });
+                            }
+                            else
+                                interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
                             break;
                         default:
                             interaction.reply({ content: `Incorrect source type.`, ephemeral: true });

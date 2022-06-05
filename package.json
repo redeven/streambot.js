@@ -1,6 +1,6 @@
 {
   "name": "streambot.js",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Stream announcement bot for Discord",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

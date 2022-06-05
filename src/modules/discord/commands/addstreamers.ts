@@ -16,7 +16,7 @@ export const ADD_STREAMERS_FACTORY: CommandFactory = (configService, sources) =>
           .setName('source')
           .setDescription(`Source.`)
           .setRequired(true)
-          .addChoices(...SOURCE_CHOICES.map((choice) => ({ value: choice, name: choice }))),
+          .addChoices(...SOURCE_CHOICES.filter((source) => Object.keys(sources).includes(source)).map((choice) => ({ value: choice, name: choice }))),
       )
       .addStringOption((option) => option.setName('channels').setDescription('List of channels to subscribe (space-separated)').setRequired(true)),
     execute: (interaction: CommandInteraction) => {
@@ -29,18 +29,24 @@ export const ADD_STREAMERS_FACTORY: CommandFactory = (configService, sources) =>
           const CHANNELS = _channels.value?.toString().split(' ') || [];
           switch (_source.value) {
             case 'twitch':
-              defer(() => interaction.deferReply({ ephemeral: true }))
-                .pipe(switchMap(() => sources.twitch.addStreamers(GUILD.id, CHANNELS)))
-                .subscribe((streamers) => {
-                  interaction.editReply({ content: `Added ${streamers.length} Twitch channel${streamers.length === 1 ? '' : 's'}` });
-                });
+              if (sources.twitch) {
+                const SOURCE = sources.twitch;
+                defer(() => interaction.deferReply({ ephemeral: true }))
+                  .pipe(switchMap(() => SOURCE.addStreamers(GUILD.id, CHANNELS)))
+                  .subscribe((streamers) => {
+                    interaction.editReply({ content: `Added ${streamers.length} Twitch channel${streamers.length === 1 ? '' : 's'}` });
+                  });
+              } else interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
               break;
             case 'trovo':
-              defer(() => interaction.deferReply({ ephemeral: true }))
-                .pipe(switchMap(() => sources.trovo.addStreamers(GUILD.id, CHANNELS)))
-                .subscribe((streamers) => {
-                  interaction.editReply({ content: `Added ${streamers.length} Trovo channel${streamers.length === 1 ? '' : 's'}` });
-                });
+              if (sources.trovo) {
+                const SOURCE = sources.trovo;
+                defer(() => interaction.deferReply({ ephemeral: true }))
+                  .pipe(switchMap(() => SOURCE.addStreamers(GUILD.id, CHANNELS)))
+                  .subscribe((streamers) => {
+                    interaction.editReply({ content: `Added ${streamers.length} Trovo channel${streamers.length === 1 ? '' : 's'}` });
+                  });
+              } else interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
               break;
             default:
               interaction.reply({ content: `Incorrect source type.`, ephemeral: true });

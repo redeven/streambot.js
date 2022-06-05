@@ -25,6 +25,9 @@
     "url": "https://github.com/redeven/streambot.js/issues"
   },
   "homepage": "https://github.com/redeven/streambot.js#readme",
+  "engines": {
+    "node": ">=16.6.0"
+  },
   "devDependencies": {
     "@types/lodash": "^4.14.182",
     "@types/node": "^16.11.38",

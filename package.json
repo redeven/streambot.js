@@ -1,6 +1,6 @@
 {
   "name": "streambot.js",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Stream announcement bot for Discord",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,7 +8,9 @@
     "/dist"
   ],
   "scripts": {
-    "build": "npx tsc"
+    "build": "npx tsc",
+    "prepublishOnly": "npm run build",
+    "update-lock": "npm i --package-lock-only"
   },
   "repository": {
     "type": "git",

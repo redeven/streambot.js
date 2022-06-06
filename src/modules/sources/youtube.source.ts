@@ -101,65 +101,67 @@ export class YoutubeSource {
   }
 
   public subscribeToStreamChanges(client: Client) {
-    return this.streamChanges.pipe(
-      tap((streamChanges) => {
-        const settings = this.configuration.guilds[streamChanges.guildId];
-        const channelId = settings.channelId;
-        if (channelId) {
-          defer(() => client.channels.fetch(channelId) as Promise<TextChannel>)
-            .pipe(
-              catchError(() => EMPTY),
-              switchMap((channel) => {
-                const msgOptions: MessageOptions = {
-                  content: settings.announcementMessage.replace('{DISPLAYNAME}', streamChanges.stream.snippet?.channelTitle || ''),
-                  embeds: [
-                    {
-                      title: streamChanges.stream.snippet?.title || '',
-                      description: `https://www.youtube.com/watch?v=${streamChanges.stream.id?.videoId}`,
-                      color: 0xff0000,
-                      timestamp: new Date(),
-                      footer: {
-                        text: 'YouTube',
+    return this.streamChanges
+      .pipe(
+        tap((streamChanges) => {
+          const settings = this.configuration.guilds[streamChanges.guildId];
+          const channelId = settings.channelId;
+          if (channelId) {
+            defer(() => client.channels.fetch(channelId) as Promise<TextChannel>)
+              .pipe(
+                catchError(() => EMPTY),
+                switchMap((channel) => {
+                  const msgOptions: MessageOptions = {
+                    content: settings.announcementMessage.replace('{DISPLAYNAME}', streamChanges.stream.snippet?.channelTitle || ''),
+                    embeds: [
+                      {
+                        title: streamChanges.stream.snippet?.title || '',
+                        description: `https://www.youtube.com/watch?v=${streamChanges.stream.id?.videoId}`,
+                        color: 0xff0000,
+                        timestamp: new Date(),
+                        footer: {
+                          text: 'YouTube',
+                        },
+                        author: {
+                          name: streamChanges.stream.snippet?.channelTitle || '',
+                          url: `https://www.youtube.com/watch?v=${streamChanges.stream.id?.videoId}`,
+                          icon_url: client.user?.avatar || '',
+                        },
+                        thumbnail: {
+                          url: streamChanges.stream.snippet?.thumbnails?.default?.url || '',
+                        },
                       },
-                      author: {
-                        name: streamChanges.stream.snippet?.channelTitle || '',
-                        url: `https://www.youtube.com/watch?v=${streamChanges.stream.id?.videoId}`,
-                        icon_url: client.user?.avatar || '',
-                      },
-                      thumbnail: {
-                        url: streamChanges.stream.snippet?.thumbnails?.default?.url || '',
-                      },
-                    },
-                  ],
-                };
-                const lastStreamMessageId =
-                  this.configuration.guilds[streamChanges.guildId].sources.youtube[streamChanges.userId].lastStreamMessageId;
-                return lastStreamMessageId === undefined
-                  ? channel.send(msgOptions)
-                  : defer(() => channel.messages.fetch(lastStreamMessageId)).pipe(
-                      catchError(() => of(null)),
-                      switchMap((msg) => {
-                        if (msg === null) return defer(() => channel.send(msgOptions));
-                        const MESSAGE_TIMESTAMP = moment(msg.embeds[0].timestamp);
-                        const SIX_HOURS_AGO = moment().subtract(6, 'hours');
-                        return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
-                          ? defer(() => msg.edit(msgOptions as MessageEditOptions))
-                          : defer(() => channel.send(msgOptions));
-                      }),
-                    );
-              }),
-              tap((message) => {
-                if (!Array.isArray(message)) {
-                  const streamer = this.configuration.guilds[streamChanges.guildId].sources.youtube[streamChanges.userId];
-                  streamer.lastStreamMessageId = message.id;
-                  this.configService.saveChanges();
-                }
-              }),
-            )
-            .subscribe();
-        }
-      }),
-    );
+                    ],
+                  };
+                  const lastStreamMessageId =
+                    this.configuration.guilds[streamChanges.guildId].sources.youtube[streamChanges.userId].lastStreamMessageId;
+                  return lastStreamMessageId === undefined
+                    ? channel.send(msgOptions)
+                    : defer(() => channel.messages.fetch(lastStreamMessageId)).pipe(
+                        catchError(() => of(null)),
+                        switchMap((msg) => {
+                          if (msg === null) return defer(() => channel.send(msgOptions));
+                          const MESSAGE_TIMESTAMP = moment(msg.embeds[0].timestamp);
+                          const SIX_HOURS_AGO = moment().subtract(6, 'hours');
+                          return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
+                            ? defer(() => msg.edit(msgOptions as MessageEditOptions))
+                            : defer(() => channel.send(msgOptions));
+                        }),
+                      );
+                }),
+                tap((message) => {
+                  if (!Array.isArray(message)) {
+                    const streamer = this.configuration.guilds[streamChanges.guildId].sources.youtube[streamChanges.userId];
+                    streamer.lastStreamMessageId = message.id;
+                    this.configService.saveChanges();
+                  }
+                }),
+              )
+              .subscribe();
+          }
+        }),
+      )
+      .subscribe();
   }
 
   public setStreamerSubscription(guildId: string, userId: string) {

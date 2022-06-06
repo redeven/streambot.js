@@ -57,7 +57,7 @@ const ADD_STREAMERS_FACTORY = (configService, sources) => {
                                 (0, rxjs_1.defer)(() => interaction.deferReply({ ephemeral: true }))
                                     .pipe((0, operators_1.switchMap)(() => SOURCE.addStreamers(GUILD.id, CHANNELS)))
                                     .subscribe((streamers) => {
-                                    interaction.editReply({ content: `Added ${(streamers === null || streamers === void 0 ? void 0 : streamers.length) || 0} Trovo channel${(streamers === null || streamers === void 0 ? void 0 : streamers.length) === 1 ? '' : 's'}` });
+                                    interaction.editReply({ content: `Added ${(streamers === null || streamers === void 0 ? void 0 : streamers.length) || 0} Youtube channel${(streamers === null || streamers === void 0 ? void 0 : streamers.length) === 1 ? '' : 's'}` });
                                 });
                             }
                             else

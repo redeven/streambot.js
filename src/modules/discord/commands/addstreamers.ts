@@ -54,7 +54,7 @@ export const ADD_STREAMERS_FACTORY: CommandFactory = (configService, sources) =>
                 defer(() => interaction.deferReply({ ephemeral: true }))
                   .pipe(switchMap(() => SOURCE.addStreamers(GUILD.id, CHANNELS)))
                   .subscribe((streamers) => {
-                    interaction.editReply({ content: `Added ${streamers?.length || 0} Trovo channel${streamers?.length === 1 ? '' : 's'}` });
+                    interaction.editReply({ content: `Added ${streamers?.length || 0} Youtube channel${streamers?.length === 1 ? '' : 's'}` });
                   });
               } else interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
               break;

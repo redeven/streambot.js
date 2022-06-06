@@ -80,7 +80,8 @@ class YoutubeSource {
         return removedStreamers;
     }
     subscribeToStreamChanges(client) {
-        return this.streamChanges.pipe((0, rxjs_1.tap)((streamChanges) => {
+        return this.streamChanges
+            .pipe((0, rxjs_1.tap)((streamChanges) => {
             const settings = this.configuration.guilds[streamChanges.guildId];
             const channelId = settings.channelId;
             if (channelId) {
@@ -130,7 +131,8 @@ class YoutubeSource {
                 }))
                     .subscribe();
             }
-        }));
+        }))
+            .subscribe();
     }
     setStreamerSubscription(guildId, userId) {
         if (!this.subscriptions[guildId])

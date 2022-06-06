@@ -1,5 +1,5 @@
 import { Client } from 'discord.js';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { YoutubeSourceOpts, YoutubeSourceStreamChanges } from '../../shared/interfaces/sources/youtube.source.model';
 import { SJSConfiguration } from '../configuration/configuration';
 export declare class YoutubeSource {
@@ -14,7 +14,7 @@ export declare class YoutubeSource {
         displayName: string;
     }[] | undefined>;
     removeStreamers(guildId: string, displayNames: string[]): number;
-    subscribeToStreamChanges(client: Client): import("rxjs").Observable<YoutubeSourceStreamChanges>;
+    subscribeToStreamChanges(client: Client): Subscription;
     setStreamerSubscription(guildId: string, userId: string): void;
     removeStreamerSubscription(guildId: string, streamer: any): void;
     private getChannelIdByCustomUrl;

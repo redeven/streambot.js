@@ -5,6 +5,7 @@ const rest_1 = require("@discordjs/rest");
 const discord_js_1 = require("discord.js");
 const lodash_1 = require("lodash");
 const rxjs_1 = require("rxjs");
+const discord_model_1 = require("../../shared/interfaces/discord.model");
 const utils_1 = require("../../shared/utils/utils");
 const v9_1 = require("discord-api-types/v9");
 const commands_1 = require("./commands");
@@ -128,7 +129,7 @@ class SJSDiscord {
         return {
             guildId: guild.id,
             guildName: guild.name,
-            announcementMessage: '',
+            announcementMessage: discord_model_1.DEFAULT_ANNOUNCEMENT,
             sources: {
                 twitch: {},
                 trovo: {},

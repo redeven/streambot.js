@@ -1,6 +1,7 @@
 import { Client, MessageEditOptions, MessageOptions, TextChannel } from 'discord.js';
 import moment from 'moment';
 import { catchError, defer, EMPTY, filter, interval, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
+import { DEFAULT_ANNOUNCEMENT } from '../../shared/interfaces/discord.model';
 import { StreamerInfo } from '../../shared/interfaces/sources.model';
 import {
   TrovoChannel,
@@ -99,7 +100,7 @@ export class TrovoSource {
                 catchError(() => EMPTY),
                 switchMap((channel) => {
                   const msgOptions: MessageOptions = {
-                    content: settings.announcementMessage.replace('{DISPLAYNAME}', streamChanges.stream.username),
+                    content: (settings.announcementMessage || DEFAULT_ANNOUNCEMENT).replace('{DISPLAYNAME}', streamChanges.stream.username),
                     embeds: [
                       {
                         title: streamChanges.stream.live_title,

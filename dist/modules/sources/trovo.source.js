@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TrovoSource = void 0;
 const moment_1 = __importDefault(require("moment"));
 const rxjs_1 = require("rxjs");
+const discord_model_1 = require("../../shared/interfaces/discord.model");
 const trovo_source_model_1 = require("../../shared/interfaces/trovo.source.model");
 const utils_1 = require("../../shared/utils/utils");
 class TrovoSource {
@@ -77,7 +78,7 @@ class TrovoSource {
                 (0, rxjs_1.defer)(() => client.channels.fetch(channelId))
                     .pipe((0, rxjs_1.catchError)(() => rxjs_1.EMPTY), (0, rxjs_1.switchMap)((channel) => {
                     const msgOptions = {
-                        content: settings.announcementMessage.replace('{DISPLAYNAME}', streamChanges.stream.username),
+                        content: (settings.announcementMessage || discord_model_1.DEFAULT_ANNOUNCEMENT).replace('{DISPLAYNAME}', streamChanges.stream.username),
                         embeds: [
                             {
                                 title: streamChanges.stream.live_title,

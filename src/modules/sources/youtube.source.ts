@@ -19,7 +19,7 @@ export class YoutubeSource {
   public readonly streamChanges: Subject<YoutubeSourceStreamChanges> = new Subject();
 
   constructor(opts: YoutubeSourceOpts, configService: SJSConfiguration) {
-    this.api = google.youtube({ version: 'v3', key: opts.apiKey });
+    this.api = google.youtube({ version: 'v3', auth: opts.apiKey });
     this.configService = configService;
   }
 

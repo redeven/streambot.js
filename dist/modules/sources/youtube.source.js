@@ -13,7 +13,7 @@ class YoutubeSource {
     constructor(opts, configService) {
         this.subscriptions = {};
         this.streamChanges = new rxjs_1.Subject();
-        this.api = googleapis_1.google.youtube({ version: 'v3', key: opts.apiKey });
+        this.api = googleapis_1.google.youtube({ version: 'v3', auth: opts.apiKey });
         this.configService = configService;
     }
     init() {

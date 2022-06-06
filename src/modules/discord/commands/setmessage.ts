@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, GuildMember } from 'discord.js';
-import { CommandFactory } from '../../../shared/interfaces/discord';
+import { CommandFactory } from '../../../shared/interfaces/discord.model';
 import { hasAdministratorPrivileges } from '../../../shared/utils/utils';
 
 export const SET_MESSAGE_FACTORY: CommandFactory = (configService) => {

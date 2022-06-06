@@ -2,6 +2,7 @@ import { Client, MessageEditOptions, MessageOptions, TextChannel } from 'discord
 import { google, youtube_v3 } from 'googleapis';
 import moment from 'moment';
 import { catchError, combineLatest, defer, EMPTY, filter, iif, interval, map, of, Subject, Subscription, switchMap, tap } from 'rxjs';
+import { DEFAULT_MESSAGE } from '../../shared/interfaces/discord.model';
 import {
   YoutubeSourceOpts,
   YoutubeSourceStreamChanges,
@@ -112,7 +113,10 @@ export class YoutubeSource {
                 catchError(() => EMPTY),
                 switchMap((channel) => {
                   const msgOptions: MessageOptions = {
-                    content: settings.announcementMessage.replace('{DISPLAYNAME}', streamChanges.stream.snippet?.channelTitle || ''),
+                    content: (settings.announcementMessage || DEFAULT_MESSAGE).replace(
+                      '{DISPLAYNAME}',
+                      streamChanges.stream.snippet?.channelTitle || '',
+                    ),
                     embeds: [
                       {
                         title: streamChanges.stream.snippet?.title || '',

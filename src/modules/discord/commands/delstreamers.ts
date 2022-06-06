@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, GuildMember } from 'discord.js';
 import { defer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { CommandFactory } from '../../../shared/interfaces/discord';
+import { CommandFactory } from '../../../shared/interfaces/discord.model';
 import { SOURCE_CHOICES } from '../../../shared/interfaces/sources.model';
 import { hasAdministratorPrivileges } from '../../../shared/utils/utils';
 

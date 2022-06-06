@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
 import { defer, switchMap } from 'rxjs';
-import { CommandFactory } from '../../../shared/interfaces/discord';
+import { CommandFactory } from '../../../shared/interfaces/discord.model';
 
 export const VALIDATE_FACTORY: CommandFactory = (configService, sources) => {
   return {

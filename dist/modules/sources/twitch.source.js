@@ -9,6 +9,7 @@ const auth_1 = require("@twurple/auth");
 const eventsub_1 = require("@twurple/eventsub");
 const moment_1 = __importDefault(require("moment"));
 const rxjs_1 = require("rxjs");
+const discord_model_1 = require("../../shared/interfaces/discord.model");
 const twitch_source_model_1 = require("../../shared/interfaces/sources/twitch.source.model");
 const utils_1 = require("../../shared/utils/utils");
 class TwitchSource {
@@ -93,7 +94,7 @@ class TwitchSource {
                     if (!stream)
                         return rxjs_1.EMPTY;
                     const msgOptions = {
-                        content: settings.announcementMessage.replace('{DISPLAYNAME}', broadcaster.displayName),
+                        content: (settings.announcementMessage || discord_model_1.DEFAULT_MESSAGE).replace('{DISPLAYNAME}', broadcaster.displayName),
                         embeds: [
                             {
                                 title: stream.title,

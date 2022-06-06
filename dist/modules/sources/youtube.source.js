@@ -7,6 +7,7 @@ exports.YoutubeSource = void 0;
 const googleapis_1 = require("googleapis");
 const moment_1 = __importDefault(require("moment"));
 const rxjs_1 = require("rxjs");
+const discord_model_1 = require("../../shared/interfaces/discord.model");
 const youtube_source_model_1 = require("../../shared/interfaces/sources/youtube.source.model");
 const utils_1 = require("../../shared/utils/utils");
 class YoutubeSource {
@@ -89,7 +90,7 @@ class YoutubeSource {
                     .pipe((0, rxjs_1.catchError)(() => rxjs_1.EMPTY), (0, rxjs_1.switchMap)((channel) => {
                     var _a, _b, _c, _d, _e, _f, _g, _h, _j;
                     const msgOptions = {
-                        content: settings.announcementMessage.replace('{DISPLAYNAME}', ((_a = streamChanges.stream.snippet) === null || _a === void 0 ? void 0 : _a.channelTitle) || ''),
+                        content: (settings.announcementMessage || discord_model_1.DEFAULT_MESSAGE).replace('{DISPLAYNAME}', ((_a = streamChanges.stream.snippet) === null || _a === void 0 ? void 0 : _a.channelTitle) || ''),
                         embeds: [
                             {
                                 title: ((_b = streamChanges.stream.snippet) === null || _b === void 0 ? void 0 : _b.title) || '',

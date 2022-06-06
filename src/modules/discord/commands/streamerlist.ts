@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
-import { CommandFactory } from '../../../shared/interfaces/discord';
+import { CommandFactory } from '../../../shared/interfaces/discord.model';
 import { capitalize, sanitize } from '../../../shared/utils/utils';
 
 export const STREAMER_LIST_FACTORY: CommandFactory = (configService, sources) => {

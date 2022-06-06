@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { SJSDiscordInitOpts } from '../../shared/interfaces/discord';
+import { SJSDiscordInitOpts } from '../../shared/interfaces/discord.model';
 import { SJSConfiguration } from '../configuration/configuration';
 import { EventSubListenerCertificateConfig } from '@twurple/eventsub/lib';
 export declare class SJSDiscord {

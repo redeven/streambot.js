@@ -1,4 +1,4 @@
-import { CommandFactory } from '../../shared/interfaces/discord';
+import { CommandFactory } from '../../shared/interfaces/discord.model';
 import { ADD_STREAMERS_FACTORY } from './commands/addstreamers';
 import { DEL_STREAMERS_FACTORY } from './commands/delstreamers';
 import { REAUTHORIZE_FACTORY } from './commands/reauthorize';

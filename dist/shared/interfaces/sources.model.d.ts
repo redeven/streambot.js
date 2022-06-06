@@ -1,4 +1,4 @@
-export declare type Source = 'twitch' | 'trovo';
+export declare type Source = 'twitch' | 'trovo' | 'youtube';
 export declare const SOURCE_CHOICES: Source[];
 export declare type Sources = {
     [key in Source]: StreamerList;

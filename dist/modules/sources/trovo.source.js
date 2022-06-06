@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TrovoSource = void 0;
 const moment_1 = __importDefault(require("moment"));
 const rxjs_1 = require("rxjs");
-const trovo_source_model_1 = require("../../shared/interfaces/trovo.source.model");
+const trovo_source_model_1 = require("../../shared/interfaces/sources/trovo.source.model");
 const utils_1 = require("../../shared/utils/utils");
 class TrovoSource {
     constructor(opts, configService) {
@@ -105,8 +105,8 @@ class TrovoSource {
                             if (msg === null)
                                 return (0, rxjs_1.defer)(() => channel.send(msgOptions));
                             const MESSAGE_TIMESTAMP = (0, moment_1.default)(msg.embeds[0].timestamp);
-                            const THREE_HOURS_AGO = (0, moment_1.default)().subtract(6, 'hours');
-                            return MESSAGE_TIMESTAMP.isAfter(THREE_HOURS_AGO)
+                            const SIX_HOURS_AGO = (0, moment_1.default)().subtract(6, 'hours');
+                            return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
                                 ? (0, rxjs_1.defer)(() => msg.edit(msgOptions))
                                 : (0, rxjs_1.defer)(() => channel.send(msgOptions));
                         }));

@@ -9,7 +9,7 @@ const auth_1 = require("@twurple/auth");
 const eventsub_1 = require("@twurple/eventsub");
 const moment_1 = __importDefault(require("moment"));
 const rxjs_1 = require("rxjs");
-const twitch_source_model_1 = require("../../shared/interfaces/twitch.source.model");
+const twitch_source_model_1 = require("../../shared/interfaces/sources/twitch.source.model");
 const utils_1 = require("../../shared/utils/utils");
 class TwitchSource {
     constructor(opts, sslCert, configService) {
@@ -121,8 +121,8 @@ class TwitchSource {
                             if (msg === null)
                                 return (0, rxjs_1.defer)(() => channel.send(msgOptions));
                             const MESSAGE_TIMESTAMP = (0, moment_1.default)(msg.embeds[0].timestamp);
-                            const THREE_HOURS_AGO = (0, moment_1.default)().subtract(6, 'hours');
-                            return MESSAGE_TIMESTAMP.isAfter(THREE_HOURS_AGO)
+                            const SIX_HOURS_AGO = (0, moment_1.default)().subtract(6, 'hours');
+                            return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
                                 ? (0, rxjs_1.defer)(() => msg.edit(msgOptions))
                                 : (0, rxjs_1.defer)(() => channel.send(msgOptions));
                         }));

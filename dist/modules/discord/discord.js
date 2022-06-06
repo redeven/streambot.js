@@ -10,6 +10,7 @@ const v9_1 = require("discord-api-types/v9");
 const commands_1 = require("./commands");
 const twitch_source_1 = require("../sources/twitch.source");
 const trovo_source_1 = require("../sources/trovo.source");
+const youtube_source_1 = require("../sources/youtube.source");
 class SJSDiscord {
     constructor(opts, configService, sslCert) {
         this.commands = new discord_js_1.Collection();
@@ -33,6 +34,8 @@ class SJSDiscord {
             this.sources.twitch = new twitch_source_1.TwitchSource(opts.sources.twitch, sslCert, configService);
         if (opts.sources.trovo)
             this.sources.trovo = new trovo_source_1.TrovoSource(opts.sources.trovo, configService);
+        if (opts.sources.youtube)
+            this.sources.youtube = new youtube_source_1.YoutubeSource(opts.sources.youtube, configService);
         this.setBotCommands();
     }
     init(opts) {
@@ -43,6 +46,10 @@ class SJSDiscord {
         }
         if (opts.sources.trovo && this.sources.trovo) {
             const SOURCE = this.sources.trovo;
+            INIT_CHAIN.push(SOURCE.init().pipe((0, rxjs_1.tap)(() => SOURCE.subscribeToStreamChanges(this.client))));
+        }
+        if (opts.sources.youtube && this.sources.youtube) {
+            const SOURCE = this.sources.youtube;
             INIT_CHAIN.push(SOURCE.init().pipe((0, rxjs_1.tap)(() => SOURCE.subscribeToStreamChanges(this.client))));
         }
         return (0, rxjs_1.combineLatest)(INIT_CHAIN);
@@ -132,6 +139,7 @@ class SJSDiscord {
             sources: {
                 twitch: {},
                 trovo: {},
+                youtube: {},
             },
         };
     }

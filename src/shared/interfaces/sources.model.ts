@@ -1,6 +1,6 @@
-export type Source = 'twitch' | 'trovo';
+export type Source = 'twitch' | 'trovo' | 'youtube';
 
-export const SOURCE_CHOICES: Source[] = ['twitch', 'trovo'];
+export const SOURCE_CHOICES: Source[] = ['twitch', 'trovo', 'youtube'];
 
 export type Sources = {
   [key in Source]: StreamerList;

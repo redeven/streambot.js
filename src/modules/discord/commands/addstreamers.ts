@@ -48,6 +48,16 @@ export const ADD_STREAMERS_FACTORY: CommandFactory = (configService, sources) =>
                   });
               } else interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
               break;
+            case 'youtube':
+              if (sources.youtube) {
+                const SOURCE = sources.youtube;
+                defer(() => interaction.deferReply({ ephemeral: true }))
+                  .pipe(switchMap(() => SOURCE.addStreamers(GUILD.id, CHANNELS)))
+                  .subscribe((streamers) => {
+                    interaction.editReply({ content: `Added ${streamers?.length || 0} Trovo channel${streamers?.length === 1 ? '' : 's'}` });
+                  });
+              } else interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
+              break;
             default:
               interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
           }

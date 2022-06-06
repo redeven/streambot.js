@@ -6,6 +6,9 @@ export interface IConfiguration {
   trovo: {
     interval: number;
   };
+  youtube: {
+    interval: number;
+  };
   guilds: {
     [key: string]: IGuildConfiguration;
   };

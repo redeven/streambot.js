@@ -18,7 +18,7 @@ import {
   TwitchSourceStreamChanges,
   TwitchSourceSubscriptions,
   TWITCH_NAME_REGEX,
-} from '../../shared/interfaces/twitch.source.model';
+} from '../../shared/interfaces/sources/twitch.source.model';
 import { getNow } from '../../shared/utils/utils';
 import { SJSConfiguration } from '../configuration/configuration';
 
@@ -172,8 +172,8 @@ export class TwitchSource {
                         switchMap((msg) => {
                           if (msg === null) return defer(() => channel.send(msgOptions));
                           const MESSAGE_TIMESTAMP = moment(msg.embeds[0].timestamp);
-                          const THREE_HOURS_AGO = moment().subtract(6, 'hours');
-                          return MESSAGE_TIMESTAMP.isAfter(THREE_HOURS_AGO)
+                          const SIX_HOURS_AGO = moment().subtract(6, 'hours');
+                          return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
                             ? defer(() => msg.edit(msgOptions as MessageEditOptions))
                             : defer(() => channel.send(msgOptions));
                         }),

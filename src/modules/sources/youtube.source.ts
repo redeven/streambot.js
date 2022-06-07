@@ -128,7 +128,7 @@ export class YoutubeSource {
                         author: {
                           name: streamChanges.stream.author || 'YouTube',
                           url: streamChanges.stream.url,
-                          icon_url: client.user?.avatar || '',
+                          icon_url: client.user?.avatarURL() || '',
                         },
                       },
                     ],

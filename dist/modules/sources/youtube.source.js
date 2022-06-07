@@ -110,7 +110,7 @@ class YoutubeSource {
                                 author: {
                                     name: streamChanges.stream.author || 'YouTube',
                                     url: streamChanges.stream.url,
-                                    icon_url: ((_a = client.user) === null || _a === void 0 ? void 0 : _a.avatar) || '',
+                                    icon_url: ((_a = client.user) === null || _a === void 0 ? void 0 : _a.avatarURL()) || '',
                                 },
                             },
                         ],

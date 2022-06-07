@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.YoutubeSource = void 0;
 const googleapis_1 = require("googleapis");
 const moment_1 = __importDefault(require("moment"));
+const node_fetch_1 = __importDefault(require("node-fetch"));
+const node_html_parser_1 = __importDefault(require("node-html-parser"));
 const rxjs_1 = require("rxjs");
 const discord_model_1 = require("../../shared/interfaces/discord.model");
 const youtube_source_model_1 = require("../../shared/interfaces/sources/youtube.source.model");
@@ -52,14 +54,19 @@ class YoutubeSource {
                     CUSTOM_URLS.push(name);
             }
         }
-        const CUSTOM_URLS$ = (0, rxjs_1.iif)(() => CUSTOM_URLS.length > 0, (0, rxjs_1.combineLatest)(CUSTOM_URLS.map((customUrl) => this.getChannelIdByCustomUrl(customUrl))).pipe((0, rxjs_1.map)((idsFromCustom) => idsFromCustom.filter((id) => Boolean(id)))), (0, rxjs_1.of)([]));
-        return CUSTOM_URLS$.pipe((0, rxjs_1.switchMap)((idsFromCustom) => {
-            const FILTERED_IDS = idsFromCustom.filter((id) => !CURRENT_STREAMS.some((streamer) => streamer.userId === id));
-            return (0, rxjs_1.defer)(() => this.api.channels.list({ part: ['snippet'], id: [...CHANNEL_IDS, ...FILTERED_IDS], maxResults: 50 }));
-        }), (0, rxjs_1.map)((response) => response.data.items), (0, rxjs_1.map)((response) => response === null || response === void 0 ? void 0 : response.map((channel) => { var _a, _b; return ({ userId: channel.id || '', displayName: ((_a = channel.snippet) === null || _a === void 0 ? void 0 : _a.customUrl) || ((_b = channel.snippet) === null || _b === void 0 ? void 0 : _b.title) || '' }); })), (0, rxjs_1.tap)((streamers) => {
-            streamers === null || streamers === void 0 ? void 0 : streamers.forEach((streamer) => {
-                this.configuration.guilds[guildId].sources.youtube[streamer.userId] = streamer;
-                this.setStreamerSubscription(guildId, streamer.userId);
+        const CUSTOM_URLS$ = (0, rxjs_1.iif)(() => CUSTOM_URLS.length > 0, (0, rxjs_1.combineLatest)(CUSTOM_URLS.map((customUrl) => this.getChannelIdByCustomUrl(customUrl))), (0, rxjs_1.of)([]));
+        return CUSTOM_URLS$.pipe((0, rxjs_1.map)((results) => {
+            const MAPPED_IDS = CHANNEL_IDS.map((channelId) => ({ customUrl: null, channelId }));
+            return [...results, ...MAPPED_IDS];
+        }), (0, rxjs_1.tap)((results) => {
+            results.forEach((streamer) => {
+                if (streamer.channelId) {
+                    this.configuration.guilds[guildId].sources.youtube[streamer.channelId] = {
+                        userId: streamer.channelId,
+                        displayName: streamer.customUrl || '',
+                    };
+                    this.setStreamerSubscription(guildId, streamer.channelId);
+                }
             });
             this.configService.saveChanges();
         }));
@@ -70,7 +77,7 @@ class YoutubeSource {
         for (let name of displayNames) {
             const STREAMER = youtube_source_model_1.YOUTUBE_CHANNEL_ID_REGEX.test(name)
                 ? CURRENT_STREAMS.find((streamer) => streamer.userId === name)
-                : CURRENT_STREAMS.find((streamer) => streamer.displayName === name);
+                : CURRENT_STREAMS.find((streamer) => streamer.displayName === name && streamer.displayName !== '');
             if (STREAMER) {
                 this.removeStreamerSubscription(guildId, STREAMER);
                 delete this.configuration.guilds[guildId].sources.youtube[STREAMER.userId];
@@ -88,25 +95,22 @@ class YoutubeSource {
             if (channelId) {
                 (0, rxjs_1.defer)(() => client.channels.fetch(channelId))
                     .pipe((0, rxjs_1.catchError)(() => rxjs_1.EMPTY), (0, rxjs_1.switchMap)((channel) => {
-                    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+                    var _a;
                     const msgOptions = {
-                        content: (settings.announcementMessage || discord_model_1.DEFAULT_MESSAGE).replace('{DISPLAYNAME}', ((_a = streamChanges.stream.snippet) === null || _a === void 0 ? void 0 : _a.channelTitle) || ''),
+                        content: (settings.announcementMessage || discord_model_1.DEFAULT_MESSAGE).replace('{DISPLAYNAME}', streamChanges.stream.author || '???'),
                         embeds: [
                             {
-                                title: ((_b = streamChanges.stream.snippet) === null || _b === void 0 ? void 0 : _b.title) || '',
-                                description: `https://www.youtube.com/watch?v=${(_c = streamChanges.stream.id) === null || _c === void 0 ? void 0 : _c.videoId}`,
+                                title: streamChanges.stream.title,
+                                description: streamChanges.stream.url,
                                 color: 0xff0000,
                                 timestamp: new Date(),
                                 footer: {
                                     text: 'YouTube',
                                 },
                                 author: {
-                                    name: ((_d = streamChanges.stream.snippet) === null || _d === void 0 ? void 0 : _d.channelTitle) || '',
-                                    url: `https://www.youtube.com/watch?v=${(_e = streamChanges.stream.id) === null || _e === void 0 ? void 0 : _e.videoId}`,
-                                    icon_url: ((_f = client.user) === null || _f === void 0 ? void 0 : _f.avatar) || '',
-                                },
-                                thumbnail: {
-                                    url: ((_j = (_h = (_g = streamChanges.stream.snippet) === null || _g === void 0 ? void 0 : _g.thumbnails) === null || _h === void 0 ? void 0 : _h.default) === null || _j === void 0 ? void 0 : _j.url) || '',
+                                    name: streamChanges.stream.author || 'YouTube',
+                                    url: streamChanges.stream.url,
+                                    icon_url: ((_a = client.user) === null || _a === void 0 ? void 0 : _a.avatar) || '',
                                 },
                             },
                         ],
@@ -141,23 +145,29 @@ class YoutubeSource {
         let lastStream = { is_live: false, live_title: '', category_name: '' };
         this.subscriptions[guildId][userId] = (0, rxjs_1.interval)(this.configuration.youtube.interval * 60 * 1000)
             .pipe((0, rxjs_1.switchMap)(() => {
-            return (0, rxjs_1.defer)(() => this.api.search.list({
-                part: ['snippet'],
-                type: ['video'],
-                eventType: 'live',
-                channelId: userId,
-            })).pipe((0, rxjs_1.map)((response) => response.data.items || []));
-        }), (0, rxjs_1.filter)((streams) => {
-            var _a;
-            const IS_LIVE = !lastStream.is_live && streams.length > 0;
-            const TITLE_CHANGED = streams.length > 0 && lastStream.live_title !== ((_a = streams[0].snippet) === null || _a === void 0 ? void 0 : _a.title);
+            return (0, rxjs_1.defer)(() => (0, node_fetch_1.default)(`https://youtube.com/channel/${userId}/live`)).pipe((0, rxjs_1.switchMap)((response) => (0, rxjs_1.defer)(() => response.text())), (0, rxjs_1.map)((htmlText) => {
+                var _a, _b;
+                const IS_STREAM = htmlText.match(/(?<=hlsManifestUrl":").*\.m3u8/g);
+                if (IS_STREAM) {
+                    const html = (0, node_html_parser_1.default)(htmlText);
+                    const url = ((_a = html.querySelector('link[rel=canonical]')) === null || _a === void 0 ? void 0 : _a.attributes.href) || '';
+                    const title = ((_b = html.querySelector('meta[name="title"]')) === null || _b === void 0 ? void 0 : _b.attributes.content) || '';
+                    const author = (0, utils_1.findBetweenStrings)(htmlText, `"author":"`, `","`);
+                    return { url, title, author };
+                }
+                else {
+                    return null;
+                }
+            }));
+        }), (0, rxjs_1.filter)((stream) => {
+            const IS_LIVE = !lastStream.is_live && stream !== null;
+            const TITLE_CHANGED = stream !== null && lastStream.live_title !== stream.title;
             return IS_LIVE || TITLE_CHANGED;
-        }), (0, rxjs_1.map)((streams) => streams[0]), (0, rxjs_1.catchError)(() => (0, rxjs_1.of)(null)))
+        }), (0, rxjs_1.catchError)(() => (0, rxjs_1.of)(null)))
             .subscribe((stream) => {
-            var _a;
             if (stream === null)
                 return;
-            lastStream = { is_live: true, live_title: ((_a = stream.snippet) === null || _a === void 0 ? void 0 : _a.title) || '', category_name: 'YouTube' };
+            lastStream = { is_live: true, live_title: stream.title, category_name: 'YouTube' };
             this.streamChanges.next({ guildId, userId, stream });
         });
     }
@@ -178,12 +188,12 @@ class YoutubeSource {
             return channelIds;
         }), (0, rxjs_1.switchMap)((channelIds) => {
             if (channelIds.length) {
-                return (0, rxjs_1.defer)(() => this.api.channels.list({ part: ['snippet'], id: channelIds }));
+                return (0, rxjs_1.defer)(() => this.api.channels.list({ part: ['snippet'], id: channelIds, maxResults: 50 }));
             }
             else {
                 return (0, rxjs_1.of)(null);
             }
-        }), (0, rxjs_1.map)((response) => { var _a; return ((_a = response === null || response === void 0 ? void 0 : response.data.items) === null || _a === void 0 ? void 0 : _a.filter((item) => { var _a, _b; return ((_b = (_a = item.snippet) === null || _a === void 0 ? void 0 : _a.customUrl) === null || _b === void 0 ? void 0 : _b.toLowerCase()) === customUrl.toLowerCase(); })) || []; }), (0, rxjs_1.map)((response) => (response.length && response[0].id ? response[0].id : null)));
+        }), (0, rxjs_1.map)((response) => { var _a; return ((_a = response === null || response === void 0 ? void 0 : response.data.items) === null || _a === void 0 ? void 0 : _a.filter((item) => { var _a, _b; return ((_b = (_a = item.snippet) === null || _a === void 0 ? void 0 : _a.customUrl) === null || _b === void 0 ? void 0 : _b.toLowerCase()) === customUrl.toLowerCase(); })) || []; }), (0, rxjs_1.map)((response) => (response.length && response[0].id ? response[0].id : null)), (0, rxjs_1.map)((response) => ({ customUrl, channelId: response })));
     }
     get configuration() {
         return this.configService.getConfiguration();

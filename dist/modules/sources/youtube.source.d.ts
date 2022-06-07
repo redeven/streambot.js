@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
-import { Subject, Subscription } from 'rxjs';
-import { YoutubeSourceOpts, YoutubeSourceStreamChanges } from '../../shared/interfaces/sources/youtube.source.model';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { YoutubeCustomUrlResult, YoutubeSourceOpts, YoutubeSourceStreamChanges } from '../../shared/interfaces/sources/youtube.source.model';
 import { SJSConfiguration } from '../configuration/configuration';
 export declare class YoutubeSource {
     private readonly api;
@@ -8,11 +8,8 @@ export declare class YoutubeSource {
     private readonly configService;
     readonly streamChanges: Subject<YoutubeSourceStreamChanges>;
     constructor(opts: YoutubeSourceOpts, configService: SJSConfiguration);
-    init(): import("rxjs").Observable<null>;
-    addStreamers(guildId: string, displayNames: string[]): import("rxjs").Observable<{
-        userId: string;
-        displayName: string;
-    }[] | undefined>;
+    init(): Observable<null>;
+    addStreamers(guildId: string, displayNames: string[]): Observable<YoutubeCustomUrlResult[]>;
     removeStreamers(guildId: string, displayNames: string[]): number;
     subscribeToStreamChanges(client: Client): Subscription;
     setStreamerSubscription(guildId: string, userId: string): void;

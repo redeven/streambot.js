@@ -19,3 +19,16 @@ export function capitalize(text: string): string {
 export function hasAdministratorPrivileges(member: GuildMember, configuration: IConfiguration): boolean {
   return member.permissions.has(Permissions.FLAGS.ADMINISTRATOR) || configuration.adminUsers.includes(member.id);
 }
+
+export function findBetweenStrings(source: string, startString: string, endString: string): string | undefined {
+  const startIndex = source.indexOf(startString);
+  if (startIndex !== -1) {
+    const subString = source.substring(startIndex);
+    const endIndex = subString.indexOf(endString);
+    if (endIndex !== -1) {
+      const result = subString.substring(startString.length, endIndex);
+      return result;
+    }
+  }
+  return undefined;
+}

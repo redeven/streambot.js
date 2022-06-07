@@ -10,7 +10,7 @@ import {
 import { Client, MessageEditOptions, MessageOptions, TextChannel } from 'discord.js';
 import moment from 'moment';
 import { catchError, combineLatest, defer, EMPTY, iif, map, of, Subject, switchMap, take, tap } from 'rxjs';
-import { DEFAULT_MESSAGE } from '../../shared/interfaces/discord.model';
+import { DEFAULT_ANNOUNCEMENT } from '../../shared/interfaces/discord.model';
 import { StreamerInfo } from '../../shared/interfaces/sources.model';
 import {
   LogLevel,
@@ -143,7 +143,7 @@ export class TwitchSource {
                 switchMap(([broadcaster, stream, channel]) => {
                   if (!stream) return EMPTY;
                   const msgOptions: MessageOptions = {
-                    content: (settings.announcementMessage || DEFAULT_MESSAGE).replace('{DISPLAYNAME}', broadcaster.displayName),
+                    content: (settings.announcementMessage || DEFAULT_ANNOUNCEMENT).replace('{DISPLAYNAME}', broadcaster.displayName),
                     embeds: [
                       {
                         title: stream.title,

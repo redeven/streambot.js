@@ -24,4 +24,4 @@ export interface Command {
     execute: (interaction: CommandInteraction) => any;
 }
 export declare type CommandFactory = (configService: SJSConfiguration, sources: IDiscordSources) => Command;
-export declare const DEFAULT_MESSAGE = "**{DISPLAYNAME}** started streaming!";
+export declare const DEFAULT_ANNOUNCEMENT = "**{DISPLAYNAME}** started streaming!";

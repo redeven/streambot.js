@@ -4,7 +4,7 @@ import moment from 'moment';
 import fetch from 'node-fetch';
 import parse from 'node-html-parser';
 import { catchError, combineLatest, defer, EMPTY, filter, iif, interval, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
-import { DEFAULT_MESSAGE } from '../../shared/interfaces/discord.model';
+import { DEFAULT_ANNOUNCEMENT } from '../../shared/interfaces/discord.model';
 import {
   YoutubeCustomUrlResult,
   YoutubeSourceOpts,
@@ -115,7 +115,7 @@ export class YoutubeSource {
                 catchError(() => EMPTY),
                 switchMap((channel) => {
                   const msgOptions: MessageOptions = {
-                    content: (settings.announcementMessage || DEFAULT_MESSAGE).replace('{DISPLAYNAME}', streamChanges.stream.author || '???'),
+                    content: (settings.announcementMessage || DEFAULT_ANNOUNCEMENT).replace('{DISPLAYNAME}', streamChanges.stream.author || '???'),
                     embeds: [
                       {
                         title: streamChanges.stream.title,

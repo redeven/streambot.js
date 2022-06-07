@@ -97,7 +97,7 @@ class YoutubeSource {
                     .pipe((0, rxjs_1.catchError)(() => rxjs_1.EMPTY), (0, rxjs_1.switchMap)((channel) => {
                     var _a;
                     const msgOptions = {
-                        content: (settings.announcementMessage || discord_model_1.DEFAULT_MESSAGE).replace('{DISPLAYNAME}', streamChanges.stream.author || '???'),
+                        content: (settings.announcementMessage || discord_model_1.DEFAULT_ANNOUNCEMENT).replace('{DISPLAYNAME}', streamChanges.stream.author || '???'),
                         embeds: [
                             {
                                 title: streamChanges.stream.title,

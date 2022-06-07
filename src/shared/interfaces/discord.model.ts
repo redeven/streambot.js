@@ -29,4 +29,4 @@ export interface Command {
 
 export type CommandFactory = (configService: SJSConfiguration, sources: IDiscordSources) => Command;
 
-export const DEFAULT_MESSAGE = '**{DISPLAYNAME}** started streaming!';
+export const DEFAULT_ANNOUNCEMENT = '**{DISPLAYNAME}** started streaming!';

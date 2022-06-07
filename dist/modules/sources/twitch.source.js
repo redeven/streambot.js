@@ -94,7 +94,7 @@ class TwitchSource {
                     if (!stream)
                         return rxjs_1.EMPTY;
                     const msgOptions = {
-                        content: (settings.announcementMessage || discord_model_1.DEFAULT_MESSAGE).replace('{DISPLAYNAME}', broadcaster.displayName),
+                        content: (settings.announcementMessage || discord_model_1.DEFAULT_ANNOUNCEMENT).replace('{DISPLAYNAME}', broadcaster.displayName),
                         embeds: [
                             {
                                 title: stream.title,

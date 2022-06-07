@@ -136,7 +136,7 @@ class SJSDiscord {
         return {
             guildId: guild.id,
             guildName: guild.name,
-            announcementMessage: discord_model_1.DEFAULT_MESSAGE,
+            announcementMessage: discord_model_1.DEFAULT_ANNOUNCEMENT,
             sources: {
                 twitch: {},
                 trovo: {},

@@ -78,7 +78,7 @@ class TrovoSource {
                 (0, rxjs_1.defer)(() => client.channels.fetch(channelId))
                     .pipe((0, rxjs_1.catchError)(() => rxjs_1.EMPTY), (0, rxjs_1.switchMap)((channel) => {
                     const msgOptions = {
-                        content: (settings.announcementMessage || discord_model_1.DEFAULT_MESSAGE).replace('{DISPLAYNAME}', streamChanges.stream.username),
+                        content: (settings.announcementMessage || discord_model_1.DEFAULT_ANNOUNCEMENT).replace('{DISPLAYNAME}', streamChanges.stream.username),
                         embeds: [
                             {
                                 title: streamChanges.stream.live_title,

@@ -3,7 +3,7 @@ import { Client, Collection, Guild, Intents, Interaction, Options } from 'discor
 import { defaultsDeep } from 'lodash';
 import { catchError, combineLatest, defer, EMPTY, iif, Observable, of, switchMap, tap } from 'rxjs';
 import { IGuildConfiguration } from '../../shared/interfaces/configuration.model';
-import { Command, DEFAULT_MESSAGE, IDiscordSources, SJSDiscordInitOpts } from '../../shared/interfaces/discord.model';
+import { Command, DEFAULT_ANNOUNCEMENT, IDiscordSources, SJSDiscordInitOpts } from '../../shared/interfaces/discord.model';
 import { getNow } from '../../shared/utils/utils';
 import { SJSConfiguration } from '../configuration/configuration';
 import { Routes } from 'discord-api-types/v9';
@@ -154,7 +154,7 @@ export class SJSDiscord {
     return {
       guildId: guild.id,
       guildName: guild.name,
-      announcementMessage: DEFAULT_MESSAGE,
+      announcementMessage: DEFAULT_ANNOUNCEMENT,
       sources: {
         twitch: {},
         trovo: {},

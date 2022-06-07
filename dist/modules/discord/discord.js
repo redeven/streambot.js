@@ -40,6 +40,9 @@ class SJSDiscord {
         this.setBotCommands();
     }
     init(opts) {
+        Object.values(this.configuration.guilds).forEach((guild) => {
+            (0, lodash_1.defaultsDeep)(guild, this.getGuildDefaults({ guildId: guild.guildId, guildName: guild.guildName }));
+        });
         const INIT_CHAIN = [(0, rxjs_1.defer)(() => this.client.login(opts.token))];
         if (opts.sources.twitch && this.sources.twitch) {
             const SOURCE = this.sources.twitch;

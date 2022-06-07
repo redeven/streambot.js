@@ -43,6 +43,9 @@ export class SJSDiscord {
   }
 
   public init(opts: SJSDiscordInitOpts) {
+    Object.values(this.configuration.guilds).forEach((guild) => {
+      defaultsDeep(guild, this.getGuildDefaults({ guildId: guild.guildId, guildName: guild.guildName } as unknown as Guild));
+    });
     const INIT_CHAIN: Observable<any>[] = [defer(() => this.client.login(opts.token))];
     if (opts.sources.twitch && this.sources.twitch) {
       const SOURCE = this.sources.twitch;

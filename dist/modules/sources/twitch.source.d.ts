@@ -2,7 +2,7 @@ import { EventSubListenerCertificateConfig, EventSubMiddleware } from '@twurple/
 import { Client } from 'discord.js';
 import { Subject } from 'rxjs';
 import { StreamerInfo } from '../../shared/interfaces/sources.model';
-import { TwitchSourceOpts, TwitchSourceStreamChanges } from '../../shared/interfaces/twitch.source.model';
+import { TwitchSourceOpts, TwitchSourceStreamChanges } from '../../shared/interfaces/sources/twitch.source.model';
 import { SJSConfiguration } from '../configuration/configuration';
 export declare class TwitchSource {
     private readonly apiClient;

@@ -1,7 +1,7 @@
 import { Client } from 'discord.js';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { StreamerInfo } from '../../shared/interfaces/sources.model';
-import { TrovoSourceOpts, TrovoSourceStreamChanges } from '../../shared/interfaces/trovo.source.model';
+import { TrovoSourceOpts, TrovoSourceStreamChanges } from '../../shared/interfaces/sources/trovo.source.model';
 import { SJSConfiguration } from '../configuration/configuration';
 export declare class TrovoSource {
     private readonly opts;

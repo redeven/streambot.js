@@ -46,6 +46,15 @@ const DEL_STREAMERS_FACTORY = (configService, sources) => {
                             else
                                 interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
                             break;
+                        case 'youtube':
+                            if (sources.youtube) {
+                                const SOURCE = sources.youtube;
+                                const removedStreamers = SOURCE.removeStreamers(GUILD.id, CHANNELS);
+                                interaction.reply({ content: `Removed ${removedStreamers} Youtube channel${removedStreamers === 1 ? '' : 's'}`, ephemeral: true });
+                            }
+                            else
+                                interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
+                            break;
                         default:
                             interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
                     }

@@ -10,6 +10,7 @@ import { Routes } from 'discord-api-types/v9';
 import { Commands } from './commands';
 import { TwitchSource } from '../sources/twitch.source';
 import { TrovoSource } from '../sources/trovo.source';
+import { YoutubeSource } from '../sources/youtube.source';
 import { EventSubListenerCertificateConfig } from '@twurple/eventsub/lib';
 
 export class SJSDiscord {
@@ -37,6 +38,7 @@ export class SJSDiscord {
     this.client.on('interactionCreate', this.onInteractionCreate.bind(this));
     if (opts.sources.twitch) this.sources.twitch = new TwitchSource(opts.sources.twitch, sslCert, configService);
     if (opts.sources.trovo) this.sources.trovo = new TrovoSource(opts.sources.trovo, configService);
+    if (opts.sources.youtube) this.sources.youtube = new YoutubeSource(opts.sources.youtube, configService);
     this.setBotCommands();
   }
 
@@ -48,6 +50,10 @@ export class SJSDiscord {
     }
     if (opts.sources.trovo && this.sources.trovo) {
       const SOURCE = this.sources.trovo;
+      INIT_CHAIN.push(SOURCE.init().pipe(tap(() => SOURCE.subscribeToStreamChanges(this.client))));
+    }
+    if (opts.sources.youtube && this.sources.youtube) {
+      const SOURCE = this.sources.youtube;
       INIT_CHAIN.push(SOURCE.init().pipe(tap(() => SOURCE.subscribeToStreamChanges(this.client))));
     }
     return combineLatest(INIT_CHAIN);
@@ -152,6 +158,7 @@ export class SJSDiscord {
       sources: {
         twitch: {},
         trovo: {},
+        youtube: {},
       },
     };
   }

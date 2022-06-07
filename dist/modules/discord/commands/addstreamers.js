@@ -51,6 +51,18 @@ const ADD_STREAMERS_FACTORY = (configService, sources) => {
                             else
                                 interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
                             break;
+                        case 'youtube':
+                            if (sources.youtube) {
+                                const SOURCE = sources.youtube;
+                                (0, rxjs_1.defer)(() => interaction.deferReply({ ephemeral: true }))
+                                    .pipe((0, operators_1.switchMap)(() => SOURCE.addStreamers(GUILD.id, CHANNELS)))
+                                    .subscribe((streamers) => {
+                                    interaction.editReply({ content: `Added ${(streamers === null || streamers === void 0 ? void 0 : streamers.length) || 0} Youtube channel${(streamers === null || streamers === void 0 ? void 0 : streamers.length) === 1 ? '' : 's'}` });
+                                });
+                            }
+                            else
+                                interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
+                            break;
                         default:
                             interaction.reply({ content: `Incorrect source type.`, ephemeral: true });
                     }

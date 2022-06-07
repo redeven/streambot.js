@@ -35,6 +35,9 @@ export class SJSConfiguration {
       trovo: {
         interval: 2,
       },
+      youtube: {
+        interval: 2,
+      },
       guilds: {},
     };
   }

@@ -10,8 +10,15 @@ Currently supports:
 
 - Twitch.tv
 - Trovo.live
+- YouTube.com
 
-Requires a valid SSL certificate (privkey & fullchain) to sign Twitch subscriptions
+Source Requirements:
+
+- Twitch.tv
+  - A valid SSL certificate (privkey & fullchain) to sign subscriptions
+  - External port `443` open (if hosting an HTTPS app with expressjs use the middleware)
+- YouTube.com
+  - An API key with `YouTube Data API v3` enabled
 
 ## Installation
 

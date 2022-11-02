@@ -152,6 +152,7 @@ export class YoutubeSource {
                 tap((message) => {
                   if (!Array.isArray(message)) {
                     const streamer = this.configuration.guilds[streamChanges.guildId].sources.youtube[streamChanges.userId];
+                    streamer.displayName = streamChanges.stream.author || '';
                     streamer.lastStreamMessageId = message.id;
                     this.configService.saveChanges();
                   }

@@ -1,7 +1,6 @@
 import { Client, BaseMessageOptions, TextChannel } from 'discord.js';
 import { google, youtube_v3 } from 'googleapis';
 import moment from 'moment';
-import fetch from 'node-fetch';
 import parse from 'node-html-parser';
 import { catchError, combineLatest, defer, EMPTY, filter, iif, interval, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { DEFAULT_ANNOUNCEMENT } from '../../shared/interfaces/discord.model';

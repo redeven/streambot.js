@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.YoutubeSource = void 0;
 const googleapis_1 = require("googleapis");
 const moment_1 = __importDefault(require("moment"));
-const node_fetch_1 = __importDefault(require("node-fetch"));
 const node_html_parser_1 = __importDefault(require("node-html-parser"));
 const rxjs_1 = require("rxjs");
 const discord_model_1 = require("../../shared/interfaces/discord.model");
@@ -146,7 +145,7 @@ class YoutubeSource {
         let lastStream = { is_live: false, live_title: '', category_name: '' };
         this.subscriptions[guildId][userId] = (0, rxjs_1.interval)(this.configuration.youtube.interval * 60 * 1000)
             .pipe((0, rxjs_1.switchMap)(() => {
-            return (0, rxjs_1.defer)(() => (0, node_fetch_1.default)(`https://youtube.com/channel/${userId}/live`)).pipe((0, rxjs_1.switchMap)((response) => (0, rxjs_1.defer)(() => response.text())), (0, rxjs_1.map)((htmlText) => {
+            return (0, rxjs_1.defer)(() => fetch(`https://youtube.com/channel/${userId}/live`)).pipe((0, rxjs_1.switchMap)((response) => (0, rxjs_1.defer)(() => response.text())), (0, rxjs_1.map)((htmlText) => {
                 var _a, _b;
                 const IS_STREAM = htmlText.match(/(?<=hlsManifestUrl":").*\.m3u8/g);
                 if (IS_STREAM) {

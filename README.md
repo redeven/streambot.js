@@ -1,6 +1,6 @@
 # streambot.js
 
-[![node-current](https://img.shields.io/node/v/streambot.js?style=for-the-badge)](https://nodejs.org/download/release/latest-v16.x/)
+[![node-current](https://img.shields.io/node/v/streambot.js?style=for-the-badge)](https://nodejs.org/download/release/latest-v18.x/)
 [![GitHub](https://img.shields.io/github/license/redeven/streambot.js?style=for-the-badge)](https://github.com/redeven/streambot.js/blob/master/LICENSE.md)
 [![npm](https://img.shields.io/npm/v/streambot.js?style=for-the-badge)](https://www.npmjs.com/package/streambot.js)
 

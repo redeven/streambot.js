@@ -103,7 +103,7 @@ class YoutubeSource {
                                 title: streamChanges.stream.title,
                                 description: streamChanges.stream.url,
                                 color: 0xff0000,
-                                timestamp: new Date(),
+                                timestamp: new Date().toISOString(),
                                 footer: {
                                     text: 'YouTube',
                                 },

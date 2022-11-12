@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SJSDiscord = void 0;
-const rest_1 = require("@discordjs/rest");
 const discord_js_1 = require("discord.js");
 const lodash_1 = require("lodash");
 const rxjs_1 = require("rxjs");
@@ -17,9 +16,9 @@ class SJSDiscord {
         this.commands = new discord_js_1.Collection();
         this.sources = {};
         this.configService = configService;
-        this.rest = new rest_1.REST({ version: '9' }).setToken(opts.token);
+        this.rest = new discord_js_1.REST({ version: '9' }).setToken(opts.token);
         this.client = new discord_js_1.Client({
-            intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES],
+            intents: [discord_js_1.GatewayIntentBits.Guilds, discord_js_1.GatewayIntentBits.GuildMessages],
             makeCache: discord_js_1.Options.cacheWithLimits({
                 MessageManager: {
                     maxSize: 50,
@@ -85,7 +84,7 @@ class SJSDiscord {
     }
     onReady() {
         var _a, _b;
-        (_a = this.client.user) === null || _a === void 0 ? void 0 : _a.setActivity(this.configuration.botStatus, { type: 'PLAYING' });
+        (_a = this.client.user) === null || _a === void 0 ? void 0 : _a.setActivity(this.configuration.botStatus, { type: discord_js_1.ActivityType.Playing });
         this.client.guilds.cache.each((guild) => {
             const settings = this.configuration.guilds[guild.id];
             if (settings) {

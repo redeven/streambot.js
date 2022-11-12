@@ -100,7 +100,7 @@ class TwitchSource {
                                 title: stream.title,
                                 description: `https://www.twitch.tv/${broadcaster.displayName}`,
                                 color: 0x9147ff,
-                                timestamp: new Date(),
+                                timestamp: new Date().toISOString(),
                                 footer: {
                                     text: stream.gameName,
                                 },

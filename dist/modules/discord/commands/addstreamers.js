@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ADD_STREAMERS_FACTORY = void 0;
-const builders_1 = require("@discordjs/builders");
+const discord_js_1 = require("discord.js");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const sources_model_1 = require("../../../shared/interfaces/sources.model");
 const utils_1 = require("../../../shared/utils/utils");
 const ADD_STREAMERS_FACTORY = (configService, sources) => {
     return {
-        data: new builders_1.SlashCommandBuilder()
+        data: new discord_js_1.SlashCommandBuilder()
             .setName('addstreamers')
             .setDescription('Subscribe to streamers to display stream announcements from.')
             .addStringOption((option) => option

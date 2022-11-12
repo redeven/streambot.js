@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SET_MESSAGE_FACTORY = void 0;
-const builders_1 = require("@discordjs/builders");
+const discord_js_1 = require("discord.js");
 const utils_1 = require("../../../shared/utils/utils");
 const SET_MESSAGE_FACTORY = (configService) => {
     return {
-        data: new builders_1.SlashCommandBuilder()
+        data: new discord_js_1.SlashCommandBuilder()
             .setName('setmessage')
             .setDescription('Set the stream announcement message.')
             .addStringOption((option) => option.setName('message').setDescription('Message to send. Placeholders: {DISPLAYNAME}').setRequired(true)),

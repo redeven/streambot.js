@@ -84,7 +84,7 @@ class TrovoSource {
                                 title: streamChanges.stream.live_title,
                                 description: streamChanges.stream.channel_url,
                                 color: 0x30c07b,
-                                timestamp: new Date(),
+                                timestamp: new Date().toISOString(),
                                 footer: {
                                     text: streamChanges.stream.category_name,
                                 },

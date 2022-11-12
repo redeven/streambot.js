@@ -1,5 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction, GuildMember } from 'discord.js';
+import { CommandInteraction, GuildMember, SlashCommandBuilder } from 'discord.js';
 import { CommandFactory } from '../../../shared/interfaces/discord.model';
 import { hasAdministratorPrivileges } from '../../../shared/utils/utils';
 

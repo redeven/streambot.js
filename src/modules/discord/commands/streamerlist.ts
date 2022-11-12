@@ -1,5 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandFactory } from '../../../shared/interfaces/discord.model';
 import { capitalize, sanitize } from '../../../shared/utils/utils';
 

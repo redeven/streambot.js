@@ -1,4 +1,4 @@
-import { GuildMember, Permissions } from 'discord.js';
+import { GuildMember, PermissionsBitField } from 'discord.js';
 import moment from 'moment';
 import { IConfiguration } from '../interfaces/configuration.model';
 
@@ -17,7 +17,7 @@ export function capitalize(text: string): string {
 }
 
 export function hasAdministratorPrivileges(member: GuildMember, configuration: IConfiguration): boolean {
-  return member.permissions.has(Permissions.FLAGS.ADMINISTRATOR) || configuration.adminUsers.includes(member.id);
+  return member.permissions.has(PermissionsBitField.Flags.Administrator) || configuration.adminUsers.includes(member.id);
 }
 
 export function findBetweenStrings(source: string, startString: string, endString: string): string | undefined {

@@ -1,5 +1,4 @@
-import { REST } from '@discordjs/rest';
-import { Client, Collection, Guild, Intents, Interaction, Options } from 'discord.js';
+import { ActivityType, Client, Collection, GatewayIntentBits, Guild, Interaction, Options, REST } from 'discord.js';
 import { defaultsDeep } from 'lodash';
 import { catchError, combineLatest, defer, EMPTY, iif, Observable, of, switchMap, tap } from 'rxjs';
 import { IGuildConfiguration } from '../../shared/interfaces/configuration.model';
@@ -24,7 +23,7 @@ export class SJSDiscord {
     this.configService = configService;
     this.rest = new REST({ version: '9' }).setToken(opts.token);
     this.client = new Client({
-      intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+      intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
       makeCache: Options.cacheWithLimits({
         MessageManager: {
           maxSize: 50,
@@ -101,7 +100,7 @@ export class SJSDiscord {
   }
 
   private onReady(): void {
-    this.client.user?.setActivity(this.configuration.botStatus, { type: 'PLAYING' });
+    this.client.user?.setActivity(this.configuration.botStatus, { type: ActivityType.Playing });
     this.client.guilds.cache.each((guild) => {
       const settings = this.configuration.guilds[guild.id];
       if (settings) {

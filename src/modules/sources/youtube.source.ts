@@ -1,4 +1,4 @@
-import { Client, MessageEditOptions, MessageOptions, TextChannel } from 'discord.js';
+import { Client, BaseMessageOptions, TextChannel } from 'discord.js';
 import { google, youtube_v3 } from 'googleapis';
 import moment from 'moment';
 import fetch from 'node-fetch';
@@ -114,14 +114,14 @@ export class YoutubeSource {
               .pipe(
                 catchError(() => EMPTY),
                 switchMap((channel) => {
-                  const msgOptions: MessageOptions = {
+                  const msgOptions: BaseMessageOptions = {
                     content: (settings.announcementMessage || DEFAULT_ANNOUNCEMENT).replace('{DISPLAYNAME}', streamChanges.stream.author || '???'),
                     embeds: [
                       {
                         title: streamChanges.stream.title,
                         description: streamChanges.stream.url,
                         color: 0xff0000,
-                        timestamp: new Date(),
+                        timestamp: new Date().toISOString(),
                         footer: {
                           text: 'YouTube',
                         },
@@ -144,7 +144,7 @@ export class YoutubeSource {
                           const MESSAGE_TIMESTAMP = moment(msg.embeds[0].timestamp);
                           const SIX_HOURS_AGO = moment().subtract(6, 'hours');
                           return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
-                            ? defer(() => msg.edit(msgOptions as MessageEditOptions))
+                            ? defer(() => msg.edit(msgOptions))
                             : defer(() => channel.send(msgOptions));
                         }),
                       );

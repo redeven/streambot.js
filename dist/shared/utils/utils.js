@@ -21,7 +21,7 @@ function capitalize(text) {
 }
 exports.capitalize = capitalize;
 function hasAdministratorPrivileges(member, configuration) {
-    return member.permissions.has(discord_js_1.Permissions.FLAGS.ADMINISTRATOR) || configuration.adminUsers.includes(member.id);
+    return member.permissions.has(discord_js_1.PermissionsBitField.Flags.Administrator) || configuration.adminUsers.includes(member.id);
 }
 exports.hasAdministratorPrivileges = hasAdministratorPrivileges;
 function findBetweenStrings(source, startString, endString) {

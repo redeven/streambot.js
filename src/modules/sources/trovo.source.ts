@@ -1,4 +1,4 @@
-import { Client, MessageEditOptions, MessageOptions, TextChannel } from 'discord.js';
+import { Client, BaseMessageOptions, TextChannel } from 'discord.js';
 import moment from 'moment';
 import { catchError, defer, EMPTY, filter, interval, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { DEFAULT_ANNOUNCEMENT } from '../../shared/interfaces/discord.model';
@@ -99,14 +99,14 @@ export class TrovoSource {
               .pipe(
                 catchError(() => EMPTY),
                 switchMap((channel) => {
-                  const msgOptions: MessageOptions = {
+                  const msgOptions: BaseMessageOptions = {
                     content: (settings.announcementMessage || DEFAULT_ANNOUNCEMENT).replace('{DISPLAYNAME}', streamChanges.stream.username),
                     embeds: [
                       {
                         title: streamChanges.stream.live_title,
                         description: streamChanges.stream.channel_url,
                         color: 0x30c07b,
-                        timestamp: new Date(),
+                        timestamp: new Date().toISOString(),
                         footer: {
                           text: streamChanges.stream.category_name,
                         },
@@ -132,7 +132,7 @@ export class TrovoSource {
                           const MESSAGE_TIMESTAMP = moment(msg.embeds[0].timestamp);
                           const SIX_HOURS_AGO = moment().subtract(6, 'hours');
                           return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
-                            ? defer(() => msg.edit(msgOptions as MessageEditOptions))
+                            ? defer(() => msg.edit(msgOptions))
                             : defer(() => channel.send(msgOptions));
                         }),
                       );

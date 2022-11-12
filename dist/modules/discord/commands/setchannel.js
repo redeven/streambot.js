@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SET_CHANNEL_FACTORY = void 0;
-const builders_1 = require("@discordjs/builders");
+const discord_js_1 = require("discord.js");
 const utils_1 = require("../../../shared/utils/utils");
 const SET_CHANNEL_FACTORY = (configService) => {
     return {
-        data: new builders_1.SlashCommandBuilder()
+        data: new discord_js_1.SlashCommandBuilder()
             .setName('setchannel')
             .setDescription('Set the stream announcement channel.')
             .addStringOption((option) => option.setName('channelid').setDescription('Channel id. If empty, uses current channel id.')),

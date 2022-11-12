@@ -7,7 +7,7 @@ import {
   EventSubMiddleware,
   EventSubStreamOnlineEvent,
 } from '@twurple/eventsub';
-import { Client, MessageEditOptions, MessageOptions, TextChannel } from 'discord.js';
+import { Client, BaseMessageOptions, TextChannel } from 'discord.js';
 import moment from 'moment';
 import { catchError, combineLatest, defer, EMPTY, iif, map, of, Subject, switchMap, take, tap } from 'rxjs';
 import { DEFAULT_ANNOUNCEMENT } from '../../shared/interfaces/discord.model';
@@ -142,14 +142,14 @@ export class TwitchSource {
                 catchError(() => EMPTY),
                 switchMap(([broadcaster, stream, channel]) => {
                   if (!stream) return EMPTY;
-                  const msgOptions: MessageOptions = {
+                  const msgOptions: BaseMessageOptions = {
                     content: (settings.announcementMessage || DEFAULT_ANNOUNCEMENT).replace('{DISPLAYNAME}', broadcaster.displayName),
                     embeds: [
                       {
                         title: stream.title,
                         description: `https://www.twitch.tv/${broadcaster.displayName}`,
                         color: 0x9147ff,
-                        timestamp: new Date(),
+                        timestamp: new Date().toISOString(),
                         footer: {
                           text: stream.gameName,
                         },
@@ -175,7 +175,7 @@ export class TwitchSource {
                           const MESSAGE_TIMESTAMP = moment(msg.embeds[0].timestamp);
                           const SIX_HOURS_AGO = moment().subtract(6, 'hours');
                           return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
-                            ? defer(() => msg.edit(msgOptions as MessageEditOptions))
+                            ? defer(() => msg.edit(msgOptions))
                             : defer(() => channel.send(msgOptions));
                         }),
                       );

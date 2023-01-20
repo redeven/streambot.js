@@ -1,12 +1,7 @@
 import { ApiClient } from '@twurple/api';
 import { ClientCredentialsAuthProvider } from '@twurple/auth';
-import {
-  DirectConnectionAdapter,
-  EventSubListener,
-  EventSubListenerCertificateConfig,
-  EventSubMiddleware,
-  EventSubStreamOnlineEvent,
-} from '@twurple/eventsub';
+import { DirectConnectionAdapter, EventSubHttpListener, EventSubHttpListenerCertificateConfig, EventSubMiddleware } from '@twurple/eventsub-http';
+import { EventSubStreamOnlineEvent } from '@twurple/eventsub-base';
 import { Client, BaseMessageOptions, TextChannel } from 'discord.js';
 import moment from 'moment';
 import { catchError, combineLatest, defer, EMPTY, iif, map, of, Subject, switchMap, take, tap } from 'rxjs';
@@ -25,7 +20,7 @@ import { SJSConfiguration } from '../configuration/configuration';
 
 export class TwitchSource {
   private readonly apiClient: ApiClient;
-  private readonly eventSubListener: EventSubListener;
+  private readonly eventSubListener: EventSubHttpListener;
   private readonly eventSubMiddleware: EventSubMiddleware;
   private readonly isExpressMiddleware: boolean;
   private readonly subscriptions: TwitchSourceSubscriptions = {};
@@ -33,14 +28,14 @@ export class TwitchSource {
 
   public streamChanges: Subject<TwitchSourceStreamChanges> = new Subject();
 
-  constructor(opts: TwitchSourceOpts, sslCert: EventSubListenerCertificateConfig, configService: SJSConfiguration) {
+  constructor(opts: TwitchSourceOpts, sslCert: EventSubHttpListenerCertificateConfig, configService: SJSConfiguration) {
     this.isExpressMiddleware = Boolean(opts.expressMiddleware);
     this.configService = configService;
     const { clientId, clientSecret, hostName } = opts;
     const authProvider = new ClientCredentialsAuthProvider(clientId, clientSecret);
     const adapter = new DirectConnectionAdapter({ hostName, sslCert });
     this.apiClient = new ApiClient({ authProvider });
-    this.eventSubListener = new EventSubListener({
+    this.eventSubListener = new EventSubHttpListener({
       apiClient: this.apiClient,
       secret: clientSecret,
       adapter,
@@ -174,9 +169,7 @@ export class TwitchSource {
                           if (msg === null) return defer(() => channel.send(msgOptions));
                           const MESSAGE_TIMESTAMP = moment(msg.embeds[0].timestamp);
                           const SIX_HOURS_AGO = moment().subtract(6, 'hours');
-                          return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
-                            ? defer(() => msg.edit(msgOptions))
-                            : defer(() => channel.send(msgOptions));
+                          return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO) ? defer(() => msg.edit(msgOptions)) : defer(() => channel.send(msgOptions));
                         }),
                       );
                 }),

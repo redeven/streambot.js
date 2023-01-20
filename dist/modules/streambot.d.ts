@@ -8,5 +8,5 @@ export declare class StreambotJs {
     init(opts: StreambotJsInitOpts): import("rxjs").Observable<any[]>;
     setConfiguration(configuration: IConfiguration): void;
     get configurationChanges(): import("rxjs").Observable<IConfiguration>;
-    get expressMiddleware(): import("@twurple/eventsub/lib").EventSubMiddleware | undefined;
+    get expressMiddleware(): import("@twurple/eventsub-http/lib").EventSubMiddleware | undefined;
 }

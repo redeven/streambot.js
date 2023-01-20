@@ -1,4 +1,4 @@
-import { EventSubListenerCertificateConfig, EventSubMiddleware } from '@twurple/eventsub';
+import { EventSubHttpListenerCertificateConfig, EventSubMiddleware } from '@twurple/eventsub-http';
 import { Client } from 'discord.js';
 import { Subject } from 'rxjs';
 import { StreamerInfo } from '../../shared/interfaces/sources.model';
@@ -12,15 +12,15 @@ export declare class TwitchSource {
     private readonly subscriptions;
     private readonly configService;
     streamChanges: Subject<TwitchSourceStreamChanges>;
-    constructor(opts: TwitchSourceOpts, sslCert: EventSubListenerCertificateConfig, configService: SJSConfiguration);
-    init(opts: TwitchSourceOpts): import("rxjs").Observable<import("@twurple/eventsub").EventSubSubscription<unknown>[]>;
+    constructor(opts: TwitchSourceOpts, sslCert: EventSubHttpListenerCertificateConfig, configService: SJSConfiguration);
+    init(opts: TwitchSourceOpts): import("rxjs").Observable<import("@twurple/eventsub-base").EventSubSubscription<unknown>[]>;
     addStreamers(guildId: string, displayNames: string[]): import("rxjs").Observable<StreamerInfo[]>;
     removeStreamers(guildId: string, displayNames: string[]): import("rxjs").Observable<void[]>;
     subscribeToStreamChanges(client: Client): import("rxjs").Subscription;
-    setStreamerSubscription(guildId: string, userId: string): import("rxjs").Observable<import("@twurple/eventsub").EventSubSubscription<unknown>>;
+    setStreamerSubscription(guildId: string, userId: string): import("rxjs").Observable<import("@twurple/eventsub-base").EventSubSubscription<unknown>>;
     removeStreamerSubscription(guildId: string, streamer: StreamerInfo): import("rxjs").Observable<void>;
     getAllSubscriptionsStatus(): string;
-    reauthorizeInvalidSubscriptions(): import("rxjs").Observable<import("@twurple/eventsub").EventSubSubscription<unknown>[]>;
+    reauthorizeInvalidSubscriptions(): import("rxjs").Observable<import("@twurple/eventsub-base").EventSubSubscription<unknown>[]>;
     private getUser;
     private get configuration();
     get expressMiddleware(): EventSubMiddleware;

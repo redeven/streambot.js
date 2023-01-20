@@ -10,7 +10,7 @@ import { Commands } from './commands';
 import { TwitchSource } from '../sources/twitch.source';
 import { TrovoSource } from '../sources/trovo.source';
 import { YoutubeSource } from '../sources/youtube.source';
-import { EventSubListenerCertificateConfig } from '@twurple/eventsub/lib';
+import { EventSubHttpListenerCertificateConfig } from '@twurple/eventsub-http';
 
 export class SJSDiscord {
   private configService: SJSConfiguration;
@@ -19,7 +19,7 @@ export class SJSDiscord {
   private commands: Collection<string, Command> = new Collection();
   private sources: IDiscordSources = {};
 
-  constructor(opts: SJSDiscordInitOpts, configService: SJSConfiguration, sslCert: EventSubListenerCertificateConfig) {
+  constructor(opts: SJSDiscordInitOpts, configService: SJSConfiguration, sslCert: EventSubHttpListenerCertificateConfig) {
     this.configService = configService;
     this.rest = new REST({ version: '9' }).setToken(opts.token);
     this.client = new Client({

@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TwitchSource = void 0;
 const api_1 = require("@twurple/api");
 const auth_1 = require("@twurple/auth");
-const eventsub_1 = require("@twurple/eventsub");
+const eventsub_http_1 = require("@twurple/eventsub-http");
 const moment_1 = __importDefault(require("moment"));
 const rxjs_1 = require("rxjs");
 const discord_model_1 = require("../../shared/interfaces/discord.model");
@@ -20,9 +20,9 @@ class TwitchSource {
         this.configService = configService;
         const { clientId, clientSecret, hostName } = opts;
         const authProvider = new auth_1.ClientCredentialsAuthProvider(clientId, clientSecret);
-        const adapter = new eventsub_1.DirectConnectionAdapter({ hostName, sslCert });
+        const adapter = new eventsub_http_1.DirectConnectionAdapter({ hostName, sslCert });
         this.apiClient = new api_1.ApiClient({ authProvider });
-        this.eventSubListener = new eventsub_1.EventSubListener({
+        this.eventSubListener = new eventsub_http_1.EventSubHttpListener({
             apiClient: this.apiClient,
             secret: clientSecret,
             adapter,
@@ -32,7 +32,7 @@ class TwitchSource {
             },
             strictHostCheck: true,
         });
-        this.eventSubMiddleware = new eventsub_1.EventSubMiddleware({
+        this.eventSubMiddleware = new eventsub_http_1.EventSubMiddleware({
             apiClient: this.apiClient,
             hostName,
             pathPrefix: '/twitch',
@@ -123,9 +123,7 @@ class TwitchSource {
                                 return (0, rxjs_1.defer)(() => channel.send(msgOptions));
                             const MESSAGE_TIMESTAMP = (0, moment_1.default)(msg.embeds[0].timestamp);
                             const SIX_HOURS_AGO = (0, moment_1.default)().subtract(6, 'hours');
-                            return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
-                                ? (0, rxjs_1.defer)(() => msg.edit(msgOptions))
-                                : (0, rxjs_1.defer)(() => channel.send(msgOptions));
+                            return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO) ? (0, rxjs_1.defer)(() => msg.edit(msgOptions)) : (0, rxjs_1.defer)(() => channel.send(msgOptions));
                         }));
                 }), (0, rxjs_1.tap)((message) => {
                     var _a;

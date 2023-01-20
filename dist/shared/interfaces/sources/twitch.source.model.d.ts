@@ -1,4 +1,4 @@
-import { EventSubStreamOnlineEvent, EventSubSubscription } from '@twurple/eventsub';
+import { EventSubStreamOnlineEvent, EventSubSubscription } from '@twurple/eventsub-base';
 export interface TwitchSourceOpts {
     clientId: string;
     clientSecret: string;

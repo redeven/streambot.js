@@ -2,6 +2,7 @@ import { IConfiguration } from '../shared/interfaces/configuration.model';
 import { StreambotJsInitOpts, StreambotJsSslCert } from '../shared/interfaces/streambot.model';
 import { SJSConfiguration } from './configuration/configuration';
 import { SJSDiscord } from './discord/discord';
+import { SJSLogging, LogLevel } from './logging/logging';
 
 export class StreambotJs {
   private readonly configService: SJSConfiguration;
@@ -12,6 +13,7 @@ export class StreambotJs {
     this.configService = new SJSConfiguration();
     this.sslCert = sslCert;
     this.discord = new SJSDiscord(opts.discordOpts, this.configService, this.sslCert);
+    SJSLogging.setLogLevel(opts.logLevel ?? LogLevel.Basic);
   }
 
   public init(opts: StreambotJsInitOpts) {

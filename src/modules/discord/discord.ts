@@ -11,6 +11,7 @@ import { TwitchSource } from '../sources/twitch.source';
 import { TrovoSource } from '../sources/trovo.source';
 import { YoutubeSource } from '../sources/youtube.source';
 import { EventSubHttpListenerCertificateConfig } from '@twurple/eventsub-http';
+import { SJSLogging } from '../logging/logging';
 
 export class SJSDiscord {
   private configService: SJSConfiguration;
@@ -89,7 +90,7 @@ export class SJSDiscord {
             () => COMMANDS_TO_DELETE.size > 0,
             combineLatest(COMMANDS_TO_DELETE.map((cmd) => defer(() => cmd.delete()))).pipe(
               tap(() => {
-                console.log(`[${getNow()}] [streambot.js] {Discord} Cleaned up ${COMMANDS_TO_DELETE.size} deprecated commands`);
+                SJSLogging.log(`[${getNow()}] [streambot.js] {Discord} Cleaned up ${COMMANDS_TO_DELETE.size} deprecated commands`);
               }),
             ),
             EMPTY,
@@ -117,7 +118,7 @@ export class SJSDiscord {
             if (result) {
               return this.removeDeprecatedCommands();
             } else {
-              console.error(`[${getNow()}] [streambot.js] {Discord} Failed to register global commands`);
+              SJSLogging.error(`[${getNow()}] [streambot.js] {Discord} Failed to register global commands`);
               return EMPTY;
             }
           }),
@@ -125,7 +126,7 @@ export class SJSDiscord {
         .subscribe();
     }
     this.configService.saveChanges();
-    console.log(`[${getNow()}] [streambot.js] {Discord} Logged in as ${this.client.user?.tag}`);
+    SJSLogging.log(`[${getNow()}] [streambot.js] {Discord} Logged in as ${this.client.user?.tag}`);
   }
 
   private onGuildCreate(guild: Guild): void {

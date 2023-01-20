@@ -27,12 +27,3 @@ export interface TwitchInvalidSubscription {
 }
 
 export const TWITCH_NAME_REGEX = /^[a-zA-Z0-9\-\_]{4,25}$/g;
-
-export enum LogLevel {
-  CRITICAL = 0,
-  ERROR = 1,
-  WARNING = 2,
-  INFO = 3,
-  DEBUG = 4,
-  TRACE = 7,
-}

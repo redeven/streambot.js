@@ -13,6 +13,7 @@ import {
 } from '../../shared/interfaces/sources/youtube.source.model';
 import { findBetweenStrings, getNow } from '../../shared/utils/utils';
 import { SJSConfiguration } from '../configuration/configuration';
+import { SJSLogging } from '../logging/logging';
 
 export class YoutubeSource {
   private readonly api: youtube_v3.Youtube;
@@ -38,10 +39,10 @@ export class YoutubeSource {
             STREAMERS.forEach((streamer) => {
               this.setStreamerSubscription(guild.guildId, streamer.userId);
             });
-            console.log(`[${getNow()}] [streambot.js] {Youtube} Subscribed to ${STREAMERS.length} channels on server ${guild.guildName}`);
+            SJSLogging.log(`[${getNow()}] [streambot.js] {Youtube} Subscribed to ${STREAMERS.length} channels on server ${guild.guildName}`);
           });
         } else {
-          console.log(`[${getNow()}] [streambot.js] {Youtube} No channels to subscribe`);
+          SJSLogging.log(`[${getNow()}] [streambot.js] {Youtube} No channels to subscribe`);
         }
       }),
     );
@@ -106,6 +107,7 @@ export class YoutubeSource {
     return this.streamChanges
       .pipe(
         tap((streamChanges) => {
+          SJSLogging.debug(`[${getNow()}] StreamChanges:`, streamChanges);
           const settings = this.configuration.guilds[streamChanges.guildId];
           const channelId = settings.channelId;
           if (channelId) {
@@ -142,9 +144,7 @@ export class YoutubeSource {
                           if (msg === null) return defer(() => channel.send(msgOptions));
                           const MESSAGE_TIMESTAMP = moment(msg.embeds[0].timestamp);
                           const SIX_HOURS_AGO = moment().subtract(6, 'hours');
-                          return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
-                            ? defer(() => msg.edit(msgOptions))
-                            : defer(() => channel.send(msgOptions));
+                          return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO) ? defer(() => msg.edit(msgOptions)) : defer(() => channel.send(msgOptions));
                         }),
                       );
                 }),
@@ -196,6 +196,7 @@ export class YoutubeSource {
       .subscribe((stream) => {
         if (stream === null) return;
         lastStream = { is_live: true, live_title: stream.title, category_name: 'YouTube' };
+        SJSLogging.debug(`[${getNow()}] YouTube Stream:`, lastStream);
         this.streamChanges.next({ guildId, userId, stream });
       });
   }

@@ -8,7 +8,6 @@ import { catchError, combineLatest, defer, EMPTY, iif, map, of, Subject, switchM
 import { DEFAULT_ANNOUNCEMENT } from '../../shared/interfaces/discord.model';
 import { StreamerInfo } from '../../shared/interfaces/sources.model';
 import {
-  LogLevel,
   TwitchInvalidSubscription,
   TwitchSourceOpts,
   TwitchSourceStreamChanges,
@@ -17,6 +16,7 @@ import {
 } from '../../shared/interfaces/sources/twitch.source.model';
 import { getNow } from '../../shared/utils/utils';
 import { SJSConfiguration } from '../configuration/configuration';
+import { SJSLogging } from '../logging/logging';
 
 export class TwitchSource {
   private readonly apiClient: ApiClient;
@@ -39,10 +39,7 @@ export class TwitchSource {
       apiClient: this.apiClient,
       secret: clientSecret,
       adapter,
-      logger: {
-        minLevel: LogLevel.CRITICAL,
-        emoji: false,
-      },
+      logger: { minLevel: 0, emoji: false },
       strictHostCheck: true,
     });
     this.eventSubMiddleware = new EventSubMiddleware({
@@ -61,7 +58,7 @@ export class TwitchSource {
       defer(() => this.eventSubListener.listen(opts.port || 443)),
     ).pipe(
       tap(() => {
-        console.log(`[${getNow()}] [streambot.js] {Twitch} Listening`);
+        SJSLogging.log(`[${getNow()}] [streambot.js] {Twitch} Listening`);
       }),
       switchMap(() => {
         return iif(
@@ -75,14 +72,14 @@ export class TwitchSource {
             Object.values(this.configuration.guilds).map((guild) =>
               combineLatest(Object.values(guild.sources.twitch).map((streamer) => this.setStreamerSubscription(guild.guildId, streamer.userId))).pipe(
                 tap((streamers) => {
-                  console.log(`[${getNow()}] [streambot.js] {Twitch} Subscribed to ${streamers.length} channels on server ${guild.guildName}`);
+                  SJSLogging.log(`[${getNow()}] [streambot.js] {Twitch} Subscribed to ${streamers.length} channels on server ${guild.guildName}`);
                 }),
               ),
             ),
           ),
           of(null).pipe(
             tap(() => {
-              console.log(`[${getNow()}] [streambot.js] {Twitch} No channels to subscribe`);
+              SJSLogging.log(`[${getNow()}] [streambot.js] {Twitch} No channels to subscribe`);
             }),
           ),
         );
@@ -125,6 +122,7 @@ export class TwitchSource {
     return this.streamChanges
       .pipe(
         tap((streamChanges) => {
+          SJSLogging.debug(`[${getNow()}] StreamChanges:`, streamChanges);
           const settings = this.configuration.guilds[streamChanges.guildId];
           const channelId = settings.channelId;
           if (channelId) {
@@ -203,6 +201,7 @@ export class TwitchSource {
     ).pipe(
       take(1),
       tap((subscription) => {
+        SJSLogging.debug(`[${getNow()}] Twitch StreamOnlineEvent:`, subscription);
         if (!this.subscriptions[guildId]) this.subscriptions[guildId] = {};
         this.subscriptions[guildId][userId] = subscription;
       }),
@@ -246,7 +245,7 @@ export class TwitchSource {
       }),
     ).pipe(
       tap((subscriptions) => {
-        console.log(`[${getNow()}] [streambot.js] {Twitch} Reauthorized ${subscriptions.length} subscriptions`);
+        SJSLogging.log(`[${getNow()}] [streambot.js] {Twitch} Reauthorized ${subscriptions.length} subscriptions`);
       }),
     );
   }

@@ -11,6 +11,7 @@ const rxjs_1 = require("rxjs");
 const discord_model_1 = require("../../shared/interfaces/discord.model");
 const youtube_source_model_1 = require("../../shared/interfaces/sources/youtube.source.model");
 const utils_1 = require("../../shared/utils/utils");
+const logging_1 = require("../logging/logging");
 class YoutubeSource {
     constructor(opts, configService) {
         this.subscriptions = {};
@@ -29,11 +30,11 @@ class YoutubeSource {
                     STREAMERS.forEach((streamer) => {
                         this.setStreamerSubscription(guild.guildId, streamer.userId);
                     });
-                    console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Youtube} Subscribed to ${STREAMERS.length} channels on server ${guild.guildName}`);
+                    logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Youtube} Subscribed to ${STREAMERS.length} channels on server ${guild.guildName}`);
                 });
             }
             else {
-                console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Youtube} No channels to subscribe`);
+                logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Youtube} No channels to subscribe`);
             }
         }));
     }
@@ -89,6 +90,7 @@ class YoutubeSource {
     subscribeToStreamChanges(client) {
         return this.streamChanges
             .pipe((0, rxjs_1.tap)((streamChanges) => {
+            logging_1.SJSLogging.debug(`[${(0, utils_1.getNow)()}] StreamChanges:`, streamChanges);
             const settings = this.configuration.guilds[streamChanges.guildId];
             const channelId = settings.channelId;
             if (channelId) {
@@ -122,9 +124,7 @@ class YoutubeSource {
                                 return (0, rxjs_1.defer)(() => channel.send(msgOptions));
                             const MESSAGE_TIMESTAMP = (0, moment_1.default)(msg.embeds[0].timestamp);
                             const SIX_HOURS_AGO = (0, moment_1.default)().subtract(6, 'hours');
-                            return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
-                                ? (0, rxjs_1.defer)(() => msg.edit(msgOptions))
-                                : (0, rxjs_1.defer)(() => channel.send(msgOptions));
+                            return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO) ? (0, rxjs_1.defer)(() => msg.edit(msgOptions)) : (0, rxjs_1.defer)(() => channel.send(msgOptions));
                         }));
                 }), (0, rxjs_1.tap)((message) => {
                     if (!Array.isArray(message)) {
@@ -168,6 +168,7 @@ class YoutubeSource {
             if (stream === null)
                 return;
             lastStream = { is_live: true, live_title: stream.title, category_name: 'YouTube' };
+            logging_1.SJSLogging.debug(`[${(0, utils_1.getNow)()}] YouTube Stream:`, lastStream);
             this.streamChanges.next({ guildId, userId, stream });
         });
     }

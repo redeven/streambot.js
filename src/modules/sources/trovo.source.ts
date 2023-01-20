@@ -13,6 +13,7 @@ import {
 } from '../../shared/interfaces/sources/trovo.source.model';
 import { getNow } from '../../shared/utils/utils';
 import { SJSConfiguration } from '../configuration/configuration';
+import { SJSLogging } from '../logging/logging';
 
 export class TrovoSource {
   private readonly opts: TrovoSourceOpts;
@@ -38,10 +39,10 @@ export class TrovoSource {
             STREAMERS.forEach((streamer) => {
               this.setStreamerSubscription(guild.guildId, streamer.userId);
             });
-            console.log(`[${getNow()}] [streambot.js] {Trovo} Subscribed to ${STREAMERS.length} channels on server ${guild.guildName}`);
+            SJSLogging.log(`[${getNow()}] [streambot.js] {Trovo} Subscribed to ${STREAMERS.length} channels on server ${guild.guildName}`);
           });
         } else {
-          console.log(`[${getNow()}] [streambot.js] {Trovo} No channels to subscribe`);
+          SJSLogging.log(`[${getNow()}] [streambot.js] {Trovo} No channels to subscribe`);
         }
       }),
     );
@@ -92,6 +93,7 @@ export class TrovoSource {
     return this.streamChanges
       .pipe(
         tap((streamChanges) => {
+          SJSLogging.debug(`[${getNow()}] StreamChanges:`, streamChanges);
           const settings = this.configuration.guilds[streamChanges.guildId];
           const channelId = settings.channelId;
           if (channelId) {
@@ -131,9 +133,7 @@ export class TrovoSource {
                           if (msg === null) return defer(() => channel.send(msgOptions));
                           const MESSAGE_TIMESTAMP = moment(msg.embeds[0].timestamp);
                           const SIX_HOURS_AGO = moment().subtract(6, 'hours');
-                          return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO)
-                            ? defer(() => msg.edit(msgOptions))
-                            : defer(() => channel.send(msgOptions));
+                          return MESSAGE_TIMESTAMP.isAfter(SIX_HOURS_AGO) ? defer(() => msg.edit(msgOptions)) : defer(() => channel.send(msgOptions));
                         }),
                       );
                 }),
@@ -183,6 +183,7 @@ export class TrovoSource {
       .subscribe((stream) => {
         if (stream === null) return;
         lastStream = { is_live: stream.is_live, live_title: stream.live_title, category_name: stream.category_name };
+        SJSLogging.debug(`[${getNow()}] Trovo Stream:`, lastStream);
         this.streamChanges.next({ guildId, userId, stream });
       });
   }

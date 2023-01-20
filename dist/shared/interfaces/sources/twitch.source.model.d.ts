@@ -22,11 +22,3 @@ export interface TwitchInvalidSubscription {
     subscription: EventSubSubscription;
 }
 export declare const TWITCH_NAME_REGEX: RegExp;
-export declare enum LogLevel {
-    CRITICAL = 0,
-    ERROR = 1,
-    WARNING = 2,
-    INFO = 3,
-    DEBUG = 4,
-    TRACE = 7
-}

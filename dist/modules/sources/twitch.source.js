@@ -12,6 +12,7 @@ const rxjs_1 = require("rxjs");
 const discord_model_1 = require("../../shared/interfaces/discord.model");
 const twitch_source_model_1 = require("../../shared/interfaces/sources/twitch.source.model");
 const utils_1 = require("../../shared/utils/utils");
+const logging_1 = require("../logging/logging");
 class TwitchSource {
     constructor(opts, sslCert, configService) {
         this.subscriptions = {};
@@ -26,10 +27,7 @@ class TwitchSource {
             apiClient: this.apiClient,
             secret: clientSecret,
             adapter,
-            logger: {
-                minLevel: twitch_source_model_1.LogLevel.CRITICAL,
-                emoji: false,
-            },
+            logger: { minLevel: 0, emoji: false },
             strictHostCheck: true,
         });
         this.eventSubMiddleware = new eventsub_http_1.EventSubMiddleware({
@@ -42,7 +40,7 @@ class TwitchSource {
     }
     init(opts) {
         return (0, rxjs_1.iif)(() => this.isExpressMiddleware, (0, rxjs_1.defer)(() => this.eventSubMiddleware.markAsReady()), (0, rxjs_1.defer)(() => this.eventSubListener.listen(opts.port || 443))).pipe((0, rxjs_1.tap)(() => {
-            console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Listening`);
+            logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Listening`);
         }), (0, rxjs_1.switchMap)(() => {
             return (0, rxjs_1.iif)(() => {
                 const GUILDS = Object.values(this.configuration.guilds);
@@ -50,9 +48,9 @@ class TwitchSource {
                 const HAS_STREAMERS = GUILDS.some((guild) => Object.values(guild.sources.twitch).length > 0);
                 return HAS_GUILDS && HAS_STREAMERS;
             }, (0, rxjs_1.combineLatest)(Object.values(this.configuration.guilds).map((guild) => (0, rxjs_1.combineLatest)(Object.values(guild.sources.twitch).map((streamer) => this.setStreamerSubscription(guild.guildId, streamer.userId))).pipe((0, rxjs_1.tap)((streamers) => {
-                console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Subscribed to ${streamers.length} channels on server ${guild.guildName}`);
+                logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Subscribed to ${streamers.length} channels on server ${guild.guildName}`);
             })))), (0, rxjs_1.of)(null).pipe((0, rxjs_1.tap)(() => {
-                console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} No channels to subscribe`);
+                logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} No channels to subscribe`);
             })));
         }), (0, rxjs_1.switchMap)(() => this.reauthorizeInvalidSubscriptions()));
     }
@@ -82,6 +80,7 @@ class TwitchSource {
     subscribeToStreamChanges(client) {
         return this.streamChanges
             .pipe((0, rxjs_1.tap)((streamChanges) => {
+            logging_1.SJSLogging.debug(`[${(0, utils_1.getNow)()}] StreamChanges:`, streamChanges);
             const settings = this.configuration.guilds[streamChanges.guildId];
             const channelId = settings.channelId;
             if (channelId) {
@@ -148,6 +147,7 @@ class TwitchSource {
                 streamChanges.next({ guildId, userId, stream });
         };
         return (0, rxjs_1.iif)(() => this.isExpressMiddleware, (0, rxjs_1.defer)(() => this.eventSubMiddleware.subscribeToStreamOnlineEvents(userId, onStreamEvent)), (0, rxjs_1.defer)(() => this.eventSubListener.subscribeToStreamOnlineEvents(userId, onStreamEvent))).pipe((0, rxjs_1.take)(1), (0, rxjs_1.tap)((subscription) => {
+            logging_1.SJSLogging.debug(`[${(0, utils_1.getNow)()}] Twitch StreamOnlineEvent:`, subscription);
             if (!this.subscriptions[guildId])
                 this.subscriptions[guildId] = {};
             this.subscriptions[guildId][userId] = subscription;
@@ -183,7 +183,7 @@ class TwitchSource {
         return (0, rxjs_1.combineLatest)(INVALID_SUBSCRIPTIONS.map((invalid) => {
             return (0, rxjs_1.defer)(() => invalid.subscription.stop()).pipe((0, rxjs_1.switchMap)(() => this.setStreamerSubscription(invalid.guildId, invalid.userId)));
         })).pipe((0, rxjs_1.tap)((subscriptions) => {
-            console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Reauthorized ${subscriptions.length} subscriptions`);
+            logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Reauthorized ${subscriptions.length} subscriptions`);
         }));
     }
     getUser(userName) {

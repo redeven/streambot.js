@@ -11,6 +11,7 @@ const commands_1 = require("./commands");
 const twitch_source_1 = require("../sources/twitch.source");
 const trovo_source_1 = require("../sources/trovo.source");
 const youtube_source_1 = require("../sources/youtube.source");
+const logging_1 = require("../logging/logging");
 class SJSDiscord {
     constructor(opts, configService, sslCert) {
         this.commands = new discord_js_1.Collection();
@@ -75,7 +76,7 @@ class SJSDiscord {
                 const CURRENT_COMMANDS = this.commands.map((cmd) => cmd.data.name);
                 const COMMANDS_TO_DELETE = commands.filter((cmd) => !CURRENT_COMMANDS.includes(cmd.name));
                 return (0, rxjs_1.iif)(() => COMMANDS_TO_DELETE.size > 0, (0, rxjs_1.combineLatest)(COMMANDS_TO_DELETE.map((cmd) => (0, rxjs_1.defer)(() => cmd.delete()))).pipe((0, rxjs_1.tap)(() => {
-                    console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Discord} Cleaned up ${COMMANDS_TO_DELETE.size} deprecated commands`);
+                    logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Discord} Cleaned up ${COMMANDS_TO_DELETE.size} deprecated commands`);
                 })), rxjs_1.EMPTY);
             }));
         }
@@ -102,14 +103,14 @@ class SJSDiscord {
                     return this.removeDeprecatedCommands();
                 }
                 else {
-                    console.error(`[${(0, utils_1.getNow)()}] [streambot.js] {Discord} Failed to register global commands`);
+                    logging_1.SJSLogging.error(`[${(0, utils_1.getNow)()}] [streambot.js] {Discord} Failed to register global commands`);
                     return rxjs_1.EMPTY;
                 }
             }))
                 .subscribe();
         }
         this.configService.saveChanges();
-        console.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Discord} Logged in as ${(_b = this.client.user) === null || _b === void 0 ? void 0 : _b.tag}`);
+        logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Discord} Logged in as ${(_b = this.client.user) === null || _b === void 0 ? void 0 : _b.tag}`);
     }
     onGuildCreate(guild) {
         const settings = this.configuration.guilds[guild.id];

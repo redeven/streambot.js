@@ -55,7 +55,7 @@ export class TwitchSource {
     return iif(
       () => this.isExpressMiddleware,
       defer(() => this.eventSubMiddleware.markAsReady()),
-      defer(() => this.eventSubListener.listen(opts.port || 443)),
+      defer(() => this.eventSubListener.start()),
     ).pipe(
       tap(() => {
         SJSLogging.log(`[${getNow()}] [streambot.js] {Twitch} Listening`);
@@ -103,6 +103,7 @@ export class TwitchSource {
         streamers.forEach((streamer) => {
           this.configuration.guilds[guildId].sources.twitch[streamer.userId] = streamer;
           this.configService.saveChanges();
+          SJSLogging.debug(`[${getNow()}] [streambot.js]: {Twitch} Streamer added: ${streamer.displayName} (${streamer.userId})`);
           this.setStreamerSubscription(guildId, streamer.userId).subscribe();
         });
       }),
@@ -192,7 +193,10 @@ export class TwitchSource {
   public setStreamerSubscription(guildId: string, userId: string) {
     const streamChanges = this.streamChanges;
     const onStreamEvent = (stream: EventSubStreamOnlineEvent) => {
-      if (stream) streamChanges.next({ guildId, userId, stream });
+      if (stream) {
+        SJSLogging.debug(`[${getNow()}] [streambot.js]: {Twitch} Stream online event: ${stream.broadcasterName} (${stream.broadcasterId})`);
+        streamChanges.next({ guildId, userId, stream });
+      }
     };
     return iif(
       () => this.isExpressMiddleware,
@@ -201,7 +205,7 @@ export class TwitchSource {
     ).pipe(
       take(1),
       tap((subscription) => {
-        SJSLogging.debug(`[${getNow()}] Twitch StreamOnlineEvent:`, subscription);
+        SJSLogging.debug(`[${getNow()}] [streambot.js] {Twitch} Subscription set: ${userId} (${subscription.verified})`);
         if (!this.subscriptions[guildId]) this.subscriptions[guildId] = {};
         this.subscriptions[guildId][userId] = subscription;
       }),
@@ -212,6 +216,7 @@ export class TwitchSource {
     const subscription = this.subscriptions[guildId][streamer.userId];
     return defer(() => subscription.stop()).pipe(
       tap(() => {
+        SJSLogging.debug(`[${getNow()}] [streambot.js]: {Twitch} Subscription removed: ${streamer.displayName} (${streamer.userId})`);
         delete this.subscriptions[guildId][streamer.userId];
         delete this.configuration.guilds[guildId].sources.twitch[streamer.userId];
         this.configService.saveChanges();
@@ -259,8 +264,12 @@ export class TwitchSource {
       catchError(() => of(null)),
       map((user) => {
         if (user) {
+          SJSLogging.debug(`[${getNow()}] [streambot.js]: {Twitch} Streamer found: ${user.displayName} (${user.id})`);
           return { userId: user.id, displayName: user.displayName };
-        } else return null;
+        } else {
+          SJSLogging.debug(`[${getNow()}] [streambot.js]: {Twitch} Streamer not found: ${userName}`);
+          return null;
+        }
       }),
     );
   }

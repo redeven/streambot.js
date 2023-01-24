@@ -39,7 +39,7 @@ class TwitchSource {
         });
     }
     init(opts) {
-        return (0, rxjs_1.iif)(() => this.isExpressMiddleware, (0, rxjs_1.defer)(() => this.eventSubMiddleware.markAsReady()), (0, rxjs_1.defer)(() => this.eventSubListener.listen(opts.port || 443))).pipe((0, rxjs_1.tap)(() => {
+        return (0, rxjs_1.iif)(() => this.isExpressMiddleware, (0, rxjs_1.defer)(() => this.eventSubMiddleware.markAsReady()), (0, rxjs_1.defer)(() => this.eventSubListener.start())).pipe((0, rxjs_1.tap)(() => {
             logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Listening`);
         }), (0, rxjs_1.switchMap)(() => {
             return (0, rxjs_1.iif)(() => {
@@ -65,6 +65,7 @@ class TwitchSource {
             streamers.forEach((streamer) => {
                 this.configuration.guilds[guildId].sources.twitch[streamer.userId] = streamer;
                 this.configService.saveChanges();
+                logging_1.SJSLogging.debug(`[${(0, utils_1.getNow)()}] [streambot.js]: {Twitch} Streamer added: ${streamer.displayName} (${streamer.userId})`);
                 this.setStreamerSubscription(guildId, streamer.userId).subscribe();
             });
         }));
@@ -143,11 +144,13 @@ class TwitchSource {
     setStreamerSubscription(guildId, userId) {
         const streamChanges = this.streamChanges;
         const onStreamEvent = (stream) => {
-            if (stream)
+            if (stream) {
+                logging_1.SJSLogging.debug(`[${(0, utils_1.getNow)()}] [streambot.js]: {Twitch} Stream online event: ${stream.broadcasterName} (${stream.broadcasterId})`);
                 streamChanges.next({ guildId, userId, stream });
+            }
         };
         return (0, rxjs_1.iif)(() => this.isExpressMiddleware, (0, rxjs_1.defer)(() => this.eventSubMiddleware.subscribeToStreamOnlineEvents(userId, onStreamEvent)), (0, rxjs_1.defer)(() => this.eventSubListener.subscribeToStreamOnlineEvents(userId, onStreamEvent))).pipe((0, rxjs_1.take)(1), (0, rxjs_1.tap)((subscription) => {
-            logging_1.SJSLogging.debug(`[${(0, utils_1.getNow)()}] Twitch StreamOnlineEvent:`, subscription);
+            logging_1.SJSLogging.debug(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Subscription set: ${userId} (${subscription.verified})`);
             if (!this.subscriptions[guildId])
                 this.subscriptions[guildId] = {};
             this.subscriptions[guildId][userId] = subscription;
@@ -156,6 +159,7 @@ class TwitchSource {
     removeStreamerSubscription(guildId, streamer) {
         const subscription = this.subscriptions[guildId][streamer.userId];
         return (0, rxjs_1.defer)(() => subscription.stop()).pipe((0, rxjs_1.tap)(() => {
+            logging_1.SJSLogging.debug(`[${(0, utils_1.getNow)()}] [streambot.js]: {Twitch} Subscription removed: ${streamer.displayName} (${streamer.userId})`);
             delete this.subscriptions[guildId][streamer.userId];
             delete this.configuration.guilds[guildId].sources.twitch[streamer.userId];
             this.configService.saveChanges();
@@ -189,10 +193,13 @@ class TwitchSource {
     getUser(userName) {
         return (0, rxjs_1.iif)(() => twitch_source_model_1.TWITCH_NAME_REGEX.test(userName), (0, rxjs_1.defer)(() => this.apiClient.users.getUserByName(userName)), (0, rxjs_1.of)(null)).pipe((0, rxjs_1.catchError)(() => (0, rxjs_1.of)(null)), (0, rxjs_1.map)((user) => {
             if (user) {
+                logging_1.SJSLogging.debug(`[${(0, utils_1.getNow)()}] [streambot.js]: {Twitch} Streamer found: ${user.displayName} (${user.id})`);
                 return { userId: user.id, displayName: user.displayName };
             }
-            else
+            else {
+                logging_1.SJSLogging.debug(`[${(0, utils_1.getNow)()}] [streambot.js]: {Twitch} Streamer not found: ${userName}`);
                 return null;
+            }
         }));
     }
     get configuration() {

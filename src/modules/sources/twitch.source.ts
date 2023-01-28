@@ -4,7 +4,7 @@ import { DirectConnectionAdapter, EventSubHttpListener, EventSubHttpListenerCert
 import { EventSubStreamOnlineEvent } from '@twurple/eventsub-base';
 import { Client, BaseMessageOptions, TextChannel } from 'discord.js';
 import moment from 'moment';
-import { catchError, combineLatest, defer, EMPTY, iif, map, of, Subject, switchMap, take, tap } from 'rxjs';
+import { catchError, combineLatest, defer, EMPTY, iif, interval, map, of, Subject, switchMap, take, tap } from 'rxjs';
 import { DEFAULT_ANNOUNCEMENT } from '../../shared/interfaces/discord.model';
 import { StreamerInfo } from '../../shared/interfaces/sources.model';
 import {
@@ -85,6 +85,7 @@ export class TwitchSource {
         );
       }),
       switchMap(() => this.reauthorizeInvalidSubscriptions()),
+      tap(() => this.schedulePeriodicReauthorization()),
     );
   }
 
@@ -253,6 +254,15 @@ export class TwitchSource {
         SJSLogging.log(`[${getNow()}] [streambot.js] {Twitch} Reauthorized ${subscriptions.length} subscriptions`);
       }),
     );
+  }
+
+  public schedulePeriodicReauthorization() {
+    return interval(60000)
+      .pipe(
+        switchMap(() => this.reauthorizeInvalidSubscriptions()),
+        catchError(() => of(null)),
+      )
+      .subscribe();
   }
 
   private getUser(userName: string) {

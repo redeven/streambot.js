@@ -52,7 +52,7 @@ class TwitchSource {
             })))), (0, rxjs_1.of)(null).pipe((0, rxjs_1.tap)(() => {
                 logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} No channels to subscribe`);
             })));
-        }), (0, rxjs_1.switchMap)(() => this.reauthorizeInvalidSubscriptions()));
+        }), (0, rxjs_1.switchMap)(() => this.reauthorizeInvalidSubscriptions()), (0, rxjs_1.tap)(() => this.schedulePeriodicReauthorization()));
     }
     addStreamers(guildId, displayNames) {
         const newStreamers = [];
@@ -189,6 +189,11 @@ class TwitchSource {
         })).pipe((0, rxjs_1.tap)((subscriptions) => {
             logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Reauthorized ${subscriptions.length} subscriptions`);
         }));
+    }
+    schedulePeriodicReauthorization() {
+        return (0, rxjs_1.interval)(60000)
+            .pipe((0, rxjs_1.switchMap)(() => this.reauthorizeInvalidSubscriptions()), (0, rxjs_1.catchError)(() => (0, rxjs_1.of)(null)))
+            .subscribe();
     }
     getUser(userName) {
         return (0, rxjs_1.iif)(() => twitch_source_model_1.TWITCH_NAME_REGEX.test(userName), (0, rxjs_1.defer)(() => this.apiClient.users.getUserByName(userName)), (0, rxjs_1.of)(null)).pipe((0, rxjs_1.catchError)(() => (0, rxjs_1.of)(null)), (0, rxjs_1.map)((user) => {

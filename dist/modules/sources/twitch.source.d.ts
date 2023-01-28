@@ -21,6 +21,7 @@ export declare class TwitchSource {
     removeStreamerSubscription(guildId: string, streamer: StreamerInfo): import("rxjs").Observable<void>;
     getAllSubscriptionsStatus(): string;
     reauthorizeInvalidSubscriptions(): import("rxjs").Observable<import("@twurple/eventsub-base").EventSubSubscription<unknown>[]>;
+    schedulePeriodicReauthorization(): import("rxjs").Subscription;
     private getUser;
     private get configuration();
     get expressMiddleware(): EventSubMiddleware;

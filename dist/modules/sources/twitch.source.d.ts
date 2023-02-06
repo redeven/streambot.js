@@ -13,14 +13,14 @@ export declare class TwitchSource {
     private readonly configService;
     streamChanges: Subject<TwitchSourceStreamChanges>;
     constructor(opts: TwitchSourceOpts, sslCert: EventSubHttpListenerCertificateConfig, configService: SJSConfiguration);
-    init(opts: TwitchSourceOpts): import("rxjs").Observable<import("@twurple/eventsub-base").EventSubSubscription<unknown>[]>;
+    init(opts: TwitchSourceOpts): import("rxjs").Observable<never[] | import("@twurple/eventsub-base").EventSubSubscription<unknown>[]>;
     addStreamers(guildId: string, displayNames: string[]): import("rxjs").Observable<StreamerInfo[]>;
     removeStreamers(guildId: string, displayNames: string[]): import("rxjs").Observable<void[]>;
     subscribeToStreamChanges(client: Client): import("rxjs").Subscription;
     setStreamerSubscription(guildId: string, userId: string): import("rxjs").Observable<import("@twurple/eventsub-base").EventSubSubscription<unknown>>;
     removeStreamerSubscription(guildId: string, streamer: StreamerInfo): import("rxjs").Observable<void>;
     getAllSubscriptionsStatus(): string;
-    reauthorizeInvalidSubscriptions(): import("rxjs").Observable<import("@twurple/eventsub-base").EventSubSubscription<unknown>[]>;
+    reauthorizeInvalidSubscriptions(): import("rxjs").Observable<never[] | import("@twurple/eventsub-base").EventSubSubscription<unknown>[]>;
     schedulePeriodicReauthorization(): import("rxjs").Subscription;
     private getUser;
     private get configuration();

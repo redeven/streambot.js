@@ -184,15 +184,18 @@ class TwitchSource {
                 }
             });
         });
-        return (0, rxjs_1.combineLatest)(INVALID_SUBSCRIPTIONS.map((invalid) => {
+        const NEW_SUBSCRIPTIONS = INVALID_SUBSCRIPTIONS.map((invalid) => {
             return (0, rxjs_1.defer)(() => invalid.subscription.stop()).pipe((0, rxjs_1.switchMap)(() => this.setStreamerSubscription(invalid.guildId, invalid.userId)));
-        })).pipe((0, rxjs_1.tap)((subscriptions) => {
+        });
+        return (0, rxjs_1.iif)(() => NEW_SUBSCRIPTIONS.length > 0, (0, rxjs_1.combineLatest)(NEW_SUBSCRIPTIONS), (0, rxjs_1.of)([])).pipe((0, rxjs_1.tap)((subscriptions) => {
             logging_1.SJSLogging.log(`[${(0, utils_1.getNow)()}] [streambot.js] {Twitch} Reauthorized ${subscriptions.length} subscriptions`);
         }));
     }
     schedulePeriodicReauthorization() {
         return (0, rxjs_1.interval)(60000)
-            .pipe((0, rxjs_1.switchMap)(() => this.reauthorizeInvalidSubscriptions()), (0, rxjs_1.catchError)(() => (0, rxjs_1.of)(null)))
+            .pipe((0, rxjs_1.filter)(() => {
+            return Object.entries(this.subscriptions).some(([guildId, subscriptions]) => Object.entries(subscriptions).some(([userId, sub]) => !sub.verified));
+        }), (0, rxjs_1.switchMap)(() => this.reauthorizeInvalidSubscriptions()), (0, rxjs_1.catchError)(() => (0, rxjs_1.of)(null)))
             .subscribe();
     }
     getUser(userName) {

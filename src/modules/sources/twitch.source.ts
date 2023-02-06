@@ -4,7 +4,7 @@ import { DirectConnectionAdapter, EventSubHttpListener, EventSubHttpListenerCert
 import { EventSubStreamOnlineEvent } from '@twurple/eventsub-base';
 import { Client, BaseMessageOptions, TextChannel } from 'discord.js';
 import moment from 'moment';
-import { catchError, combineLatest, defer, EMPTY, iif, interval, map, of, Subject, switchMap, take, tap } from 'rxjs';
+import { catchError, combineLatest, defer, EMPTY, filter, iif, interval, map, of, Subject, switchMap, take, tap } from 'rxjs';
 import { DEFAULT_ANNOUNCEMENT } from '../../shared/interfaces/discord.model';
 import { StreamerInfo } from '../../shared/interfaces/sources.model';
 import {
@@ -245,11 +245,10 @@ export class TwitchSource {
         }
       });
     });
-    return combineLatest(
-      INVALID_SUBSCRIPTIONS.map((invalid) => {
-        return defer(() => invalid.subscription.stop()).pipe(switchMap(() => this.setStreamerSubscription(invalid.guildId, invalid.userId)));
-      }),
-    ).pipe(
+    const NEW_SUBSCRIPTIONS = INVALID_SUBSCRIPTIONS.map((invalid) => {
+      return defer(() => invalid.subscription.stop()).pipe(switchMap(() => this.setStreamerSubscription(invalid.guildId, invalid.userId)));
+    });
+    return iif(() => NEW_SUBSCRIPTIONS.length > 0, combineLatest(NEW_SUBSCRIPTIONS), of([])).pipe(
       tap((subscriptions) => {
         SJSLogging.log(`[${getNow()}] [streambot.js] {Twitch} Reauthorized ${subscriptions.length} subscriptions`);
       }),
@@ -259,6 +258,11 @@ export class TwitchSource {
   public schedulePeriodicReauthorization() {
     return interval(60000)
       .pipe(
+        filter(() => {
+          return Object.entries(this.subscriptions).some(([guildId, subscriptions]) =>
+            Object.entries(subscriptions).some(([userId, sub]) => !sub.verified),
+          );
+        }),
         switchMap(() => this.reauthorizeInvalidSubscriptions()),
         catchError(() => of(null)),
       )
